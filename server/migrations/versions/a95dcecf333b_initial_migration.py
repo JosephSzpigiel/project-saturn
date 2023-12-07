@@ -1,8 +1,8 @@
-"""added tables
+"""initial migration
 
-Revision ID: 46c050da69ab
+Revision ID: a95dcecf333b
 Revises: 
-Create Date: 2023-12-05 22:45:44.515244
+Create Date: 2023-12-07 00:22:34.495742
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '46c050da69ab'
+revision = 'a95dcecf333b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,14 +33,14 @@ def upgrade():
     sa.Column('first_name', sa.String(), nullable=True),
     sa.Column('last_name', sa.String(), nullable=True),
     sa.Column('email', sa.String(), nullable=True),
-    sa.Column('phone', sa.Date(), nullable=True),
     sa.Column('img_url', sa.String(), nullable=True),
     sa.Column('user_type_id', sa.String(), nullable=True),
     sa.Column('_password_hash', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('modified_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['user_type_id'], ['user_types.id'], name=op.f('fk_users_user_type_id_user_types')),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('events',
     sa.Column('id', sa.Integer(), nullable=False),

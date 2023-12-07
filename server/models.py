@@ -10,8 +10,7 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key = True)
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
-    email = db.Column(db.String)
-    phone = db.Column(db.Date)
+    email = db.Column(db.String, unique=True)
     img_url = db.Column(db.String)
     user_type_id = db.Column(db.String, db.ForeignKey('user_types.id'))
     _password_hash = db.Column(db.String)
@@ -21,7 +20,11 @@ class User(db.Model, SerializerMixin):
     events_created = db.relationship('Event', back_populates = 'created_by', cascade = 'all, delete-orphan')
     events_registered = association_proxy('registrations', 'event')
     user_type = db.relationship('UserType', back_populates='users')
-    serialize_rules = ()
+    serialize_rules = ('-events_registered.users',
+                        '-events_created.users',
+                        '-user_type.users',
+                        '-registrations.user',
+                        '-_password_hash')
 
     @property
     def password_hash(self):
@@ -59,7 +62,9 @@ class Event(db.Model, SerializerMixin):
     users = association_proxy('regstrations', 'user')
     created_by = db.relationship('User', back_populates ='events_created')
     event_type = db.relationship('EventType', back_populates='events')
-    serialize_rules = ()
+    serialize_rules = ('-users.events_registered','-users.events_created'
+                        '-created_by.events_registered', '-created_by.events_registered',
+                        '-registrations.event', '-event_type.events')
 
     def __repr__(self):
         return f'<Event {self.id}: {self.name}>'
@@ -74,8 +79,8 @@ class Registration(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     tickets = db.Column(db.Integer)
     user = db.relationship('User', back_populates = 'registrations')
-    events = db.relationship('Event', back_populates = 'registrations')
-    serialize_rules = ()
+    event = db.relationship('Event', back_populates = 'registrations')
+    serialize_rules = ('-user.registrations', '-events.registrations')
 
     def __repr__(self):
         return f'<Registration {self.id}: User {self.user_id}, Event {self.event_id}>'
