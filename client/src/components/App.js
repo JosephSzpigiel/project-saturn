@@ -24,7 +24,7 @@ function App() {
   if(!user){
     return(
       <ChakraProvider>
-        <Header/>
+        <Header user={user} setUser={setUser} />
         <SignUp setUser={setUser} />
     </ChakraProvider>
     )
@@ -32,7 +32,7 @@ function App() {
 
   return(
     <ChakraProvider>
-      <Header/>
+      <Header user={user} setUser= {setUser}/>
       <Outlet context={context}/>
     </ChakraProvider>
   )
