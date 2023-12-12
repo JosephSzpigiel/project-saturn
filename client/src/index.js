@@ -5,6 +5,9 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignUp from "./components/SignUp";
 import HomePage from "./components/HomePage";
+import EventForm from "./components/EventForm";
+import EventPage from "./components/EventPage";
+import MyProfile from "./components/MyProfile";
 
 const routes = [
     {
@@ -13,18 +16,18 @@ const routes = [
         errorElement: <div>Error loading app!</div>,
         children: [
             {index: true, element: <HomePage/>},
-            // {
-            //     path: '/addactivity',
-            //     element: <AddActivity />,
-            // },
-            // {
-            //     path: '/dates',
-            //     element: <AllDates />,
-            // },
-            // {
-            //     path: '/dates/create',
-            //     element: <CreateDate />,
-            // },
+            {
+                path: '/addevent',
+                element: <EventForm />,
+            },
+            {
+                path: '/events/:eventId',
+                element: <EventPage />,
+            },
+            {
+                path: '/myprofile',
+                element: <MyProfile />,
+            },
         ],
     },
 ];

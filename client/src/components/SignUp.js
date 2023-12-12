@@ -6,7 +6,7 @@ import { useState } from 'react'
 
 function SignUp( {setUser} ){
 
-    const [signUp, setSignUp] = useState(true)
+    const [signUp, setSignUp] = useState(false)
     const [loginError, setLoginError] = useState(false)
 
     function toggleSignup() {
@@ -24,17 +24,12 @@ function SignUp( {setUser} ){
         img_url: yup.string().matches(URL, 'Enter a valid url')
     })
 
-    const loginSchema = yup.object().shape({
-        email: yup.string().email('Invalid email').required('Email is required!'),
-        password: yup.string().min(5, 'Password must be at least 5 characters').max(15, 'Password must be 15 characters or less').required('Password is required!'),
-    })
-
     return (
         <Flex>
             <Spacer/>
                 <Flex direction='column'>
                     <Heading m={3} size='lg' align='center'>{signUp ? 'Sign Up' : 'Log In'}</Heading>
-                    <Button minWidth={300} size='sm' onClick={toggleSignup}>{signUp ? `Have an account? Login instead!` : 'Register for an account'}</Button>
+                    <Button minWidth={360} size='sm' onClick={toggleSignup}>{signUp ? `Have an account? Login instead!` : 'Register for an account'}</Button>
                     <Formik
                         initialValues={{
                             first_name: '',
@@ -44,10 +39,10 @@ function SignUp( {setUser} ){
                             img_url: '',
                             user_type_id: 1
                         }}
-                        validationSchema={signUp ? signupSchema: loginSchema}
+                        validationSchema={signUp ? signupSchema: null}
                         validateOnBlur={true}
                         validateOnChange={false}
-                        onSubmit={values => {
+                        onSubmit={(values, actions) => {
                             const endpoint = signUp ? '/users' : '/login'
                             fetch(endpoint, {
                                 method: 'POST',
@@ -64,6 +59,7 @@ function SignUp( {setUser} ){
                                     })
                                 } else { 
                                     setLoginError(true)
+                                    actions.setSubmitting(false)
                                 }
                             })
                         }}
@@ -75,7 +71,10 @@ function SignUp( {setUser} ){
                                         <FormControl marginBottom={2} isInvalid={form.errors.first_name && form.touched.first_name}>
                                             <FormLabel>First Name</FormLabel>
                                             <Input {...field}/>
-                                            <FormErrorMessage>{errors.first_name}</FormErrorMessage>
+                                            <FormErrorMessage as={Alert} status={'error'}>
+                                                <AlertIcon />
+                                                {errors.first_name}
+                                            </FormErrorMessage>
                                         </FormControl>
                                     )}
                                 </Field>}
@@ -84,7 +83,10 @@ function SignUp( {setUser} ){
                                         <FormControl marginBottom={2} isInvalid={form.errors.last_name && form.touched.last_name}>
                                             <FormLabel>Last Name</FormLabel>
                                             <Input {...field}/>
-                                            <FormErrorMessage>{form.errors.last_name}</FormErrorMessage>
+                                            <FormErrorMessage as={Alert} status={'error'}>
+                                                <AlertIcon />
+                                                {errors.last_name}
+                                            </FormErrorMessage>
                                         </FormControl>
                                     )}
                                 </Field>}
@@ -93,7 +95,10 @@ function SignUp( {setUser} ){
                                         <FormControl marginBottom={2} isInvalid={form.errors.email && form.touched.email}>
                                             <FormLabel>Email</FormLabel>
                                             <Input type='email' {...field}/>
-                                            <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                                            <FormErrorMessage as={Alert} status={'error'}>
+                                                <AlertIcon />
+                                                {errors.email}
+                                            </FormErrorMessage>                                        
                                         </FormControl>
                                     )}
                                 </Field>
@@ -102,7 +107,10 @@ function SignUp( {setUser} ){
                                         <FormControl marginBottom={2} isInvalid={form.errors.password && form.touched.password}>
                                             <FormLabel>Password</FormLabel>
                                             <Input type='password' {...field}/>
-                                            <FormErrorMessage>{form.errors.password}</FormErrorMessage>
+                                            <FormErrorMessage as={Alert} status={'error'}>
+                                                <AlertIcon />
+                                                {errors.password}
+                                            </FormErrorMessage>  
                                         </FormControl>
                                     )}
                                 </Field>
@@ -111,18 +119,21 @@ function SignUp( {setUser} ){
                                         <FormControl marginBottom={2} isInvalid={form.errors.img_url && form.touched.img_url}>
                                             <FormLabel>Image Url</FormLabel>
                                             <Input {...field}/>
-                                            <FormErrorMessage>{form.errors.img_url}</FormErrorMessage>
+                                            <FormErrorMessage as={Alert} status={'error'}>
+                                                <AlertIcon />
+                                                {errors.img_url}
+                                            </FormErrorMessage>                                          
                                         </FormControl>
                                     )}
                                 </Field>}
                                 <Flex marginTop={4}>
                                     <Spacer/>
-                                    <Button type='submit'>Submit</Button>
+                                    <Button type='submit' isLoading={isSubmitting}>Submit</Button>
                                     <Spacer/>
                                 </Flex>
                                 {loginError && <Alert marginTop={4} status='error'>
                                     <AlertIcon />
-                                    <AlertTitle>Incorrect login information</AlertTitle>
+                                    <AlertTitle>{signUp ?  'Issue creating profile' : 'Incorrect login information' }</AlertTitle>
                                 </Alert>}
                             </Form> 
                         )}

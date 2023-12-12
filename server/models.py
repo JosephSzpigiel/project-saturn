@@ -21,10 +21,13 @@ class User(db.Model, SerializerMixin):
     events_registered = association_proxy('registrations', 'event')
     user_type = db.relationship('UserType', back_populates='users')
     serialize_rules = ('-events_registered.users',
+                        '-events_registered.created_by',
+                        '-events_created.created_by',
                         '-events_created.users',
                         '-user_type.users',
                         '-registrations.user',
                         '-_password_hash')
+
 
     @property
     def password_hash(self):
@@ -63,7 +66,7 @@ class Event(db.Model, SerializerMixin):
     created_by = db.relationship('User', back_populates ='events_created')
     event_type = db.relationship('EventType', back_populates='events')
     serialize_rules = ('-users.events_registered','-users.events_created'
-                        '-created_by.events_registered', '-created_by.events_registered',
+                        '-created_by.events_registered', '-created_by.events_created',
                         '-registrations.event', '-event_type.events')
 
     def __repr__(self):
@@ -80,7 +83,7 @@ class Registration(db.Model, SerializerMixin):
     tickets = db.Column(db.Integer)
     user = db.relationship('User', back_populates = 'registrations')
     event = db.relationship('Event', back_populates = 'registrations')
-    serialize_rules = ('-user.registrations', '-events.registrations')
+    serialize_rules = ('-user', '-event')
 
     def __repr__(self):
         return f'<Registration {self.id}: User {self.user_id}, Event {self.event_id}>'
