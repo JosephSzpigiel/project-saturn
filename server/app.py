@@ -151,6 +151,18 @@ class Registrations(Resource):
     
 api.add_resource(Registrations, '/api/v1/registrations')
 
+class RegistrationsById(Resource):
+    def delete(self, id):
+        registration = Registration.query.get(id)
+        if not registration:
+            return make_response({'error': 'registration not found'}, 404)
+        db.session.delete(registration)
+        db.session.commit()
+        return make_response('',204)
+    
+api.add_resource(RegistrationsById, '/api/v1/registrations/<int:id>')
+
+
 class RegistrationsByEventIdUserId(Resource):
     def delete(self, eventId, userId):
         event_registrations = Registration.query.filter_by(event_id = eventId).all()

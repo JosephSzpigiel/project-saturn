@@ -1,4 +1,4 @@
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
     Wrap,
@@ -9,18 +9,20 @@ import {
 import { useOutletContext, NavLink } from "react-router-dom";
 import EditEventModal from "./EditEventModal";
 import RegisterModal from "./RegisterModal";
+import RegistrationsModal from "./RegistrationsModal"
 
 function EventPage(){
     const {eventId} = useParams()
-    const [eventInfo, setEventInfo] = useState({created_by:{first_name: '', last_name: ''}, event_type:{type_name: ''}})
+    const [eventInfo, setEventInfo] = useState({created_by:{first_name: '', last_name: ''}, event_type:{type_name: ''}, registrations:[]})
     const [date, setDate] = useState('')
-    const location = useLocation()
-    const {user} = useOutletContext()
+    const {user, setUser} = useOutletContext()
     const [registered, setRegistered] = useState(false)
     const [ticketsLeft, setTicketsLeft] = useState(100000000000)
     const [ticketsSold, setTicketsSold] = useState(0)
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isEditOpen , onOpen: onEditOpen, onClose: onEditClose } = useDisclosure()
+    const { isOpen: isRegistrationsOpen , onOpen: onRegistrationsOpen, onClose: onRegistrationsClose } = useDisclosure()
+
 
     const nav = useNavigate()
 
@@ -74,6 +76,11 @@ function EventPage(){
         console.log(ticketsSold)
         onEditOpen()
     }
+
+    function handleRegistrations(){
+        console.log(eventInfo)
+        onRegistrationsOpen()
+    }
     
     const registerButton = (ticketsLeft ? 
         <Button onClick={onOpen} variant='solid' colorScheme='blue'>
@@ -92,8 +99,10 @@ function EventPage(){
                 Home
                 </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbItem as={NavLink} to='/events'>
-                <BreadcrumbLink>Events</BreadcrumbLink>
+            <BreadcrumbItem>
+                <BreadcrumbLink as={NavLink} to='/events'>
+                    Events
+                </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbItem isCurrentPage>
                 <BreadcrumbLink>
@@ -107,7 +116,7 @@ function EventPage(){
             <Skeleton fitContent={false} isLoaded>
             <Heading m={3} size='lg' align='center'>{eventInfo.name}</Heading>
             <Divider/>
-            <Heading m={3} size='sm' align='center'>{date.toString()}</Heading>
+            <Heading m={3} size='sm' align='center'>{date.toString().split(' ').slice(0,5).join(' ').split(':').slice(0,2).join(':')}</Heading>
             <CardBody>
                 <Center>
                     <Center width='80%'>
@@ -150,8 +159,8 @@ function EventPage(){
 
                 {user.id === eventInfo.created_by_id ?
                     <ButtonGroup spacing='2'>
-                        <Button variant='outline' colorScheme='blue'>
-                            View Attending
+                        <Button variant='outline' colorScheme='blue' onClick={handleRegistrations}>
+                            View Registered
                         </Button>
                         <Button variant='outline' colorScheme='blue' onClick={handleEdit}>
                             Edit Event Info
@@ -165,6 +174,7 @@ function EventPage(){
 
         <EditEventModal ticketsSold={ticketsSold} isEditOpen={isEditOpen} onEditClose={onEditClose} eventInfo={eventInfo} setDate={setDate} setTicketsLeft={setTicketsLeft} setEventInfo={setEventInfo}/>
         <RegisterModal ticketsLeft={ticketsLeft} setEventInfo={setEventInfo} isOpen={isOpen} onClose={onClose} eventInfo={eventInfo} user={user} setRegistered={setRegistered} setTicketsLeft={setTicketsLeft}/>
+        <RegistrationsModal user={user} setTicketsLeft={setTicketsLeft} setRegistered={setRegistered}eventInfo={eventInfo} setEventInfo={setEventInfo} isRegistrationsOpen={isRegistrationsOpen} onRegistrationsClose={onRegistrationsClose}/>
         </>
         )        
     }

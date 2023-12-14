@@ -65,7 +65,7 @@ class Event(db.Model, SerializerMixin):
     users = association_proxy('regstrations', 'user')
     created_by = db.relationship('User', back_populates ='events_created')
     event_type = db.relationship('EventType', back_populates='events')
-    serialize_rules = ('-users.events_registered','-users.events_created'
+    serialize_rules = ('-users',
                         '-created_by.events_registered', '-created_by.events_created',
                         '-registrations.event', '-event_type.events')
 
@@ -83,7 +83,7 @@ class Registration(db.Model, SerializerMixin):
     tickets = db.Column(db.Integer)
     user = db.relationship('User', back_populates = 'registrations')
     event = db.relationship('Event', back_populates = 'registrations')
-    serialize_rules = ('-user', '-event')
+    serialize_rules = ('-user.events_registered',  '-user.events_created', '-user.registrations', '-event')
 
     def __repr__(self):
         return f'<Registration {self.id}: User {self.user_id}, Event {self.event_id}>'

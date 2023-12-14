@@ -8,32 +8,36 @@ import {
     Td,
     TableCaption,
     TableContainer,
-    Button
+    Button,
+    useDisclosure
 } from '@chakra-ui/react'
+import CreatedEventsTabRow from './CreatedEventsTabRow'
 
-function CreatedEventsTab({user}){
+
+function CreatedEventsTab({user, setUser, setEvents}){
+
+    console.log(user.events_created)
+
+    const createdRows = user.events_created.map(event =>  {
+        return (<CreatedEventsTabRow key={event.id} event={event} user={user} setUser={setUser} setEvents={setEvents}/>)
+    })
+
+    console.log(createdRows)
 
     return(
         <Table  size='sm'>
             <Thead>
                 <Tr>
                     <Th>Event Name</Th>
-                    <Th>Date</Th>
-                    <Th>Tickets Sold</Th>
+                    <Th>Start Time</Th>
+                    <Th>Registrations</Th>
                     <Th>View</Th>
                     <Th>Edit</Th>
                     <Th>Cancel</Th>
                 </Tr>
             </Thead>
             <Tbody>
-                <Tr>
-                    <Td>Test</Td>
-                    <Td>3/16/1992</Td>
-                    <Td>4</Td>
-                    <Td><Button>View</Button></Td>
-                    <Td><Button>Edit</Button></Td>
-                    <Td><Button>Cancel</Button></Td>
-                </Tr>
+                {createdRows}
             </Tbody>
         </Table>
     )

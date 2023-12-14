@@ -3,9 +3,10 @@ import { Field, Form, Formik} from 'formik'
 import * as yup from 'yup'
 import { useState } from 'react'
 
-function ProfileTab({user}){
+function ProfileTab({user, setUser}){
 
     const [loginError, setLoginError] = useState(false)
+    const [editSuccess, setEditSuccess] = useState(false)
 
     const URL = /^((https?|ftp):\/\/)?(www.)?(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i
 
@@ -31,6 +32,7 @@ function ProfileTab({user}){
                         validateOnBlur={true}
                         validateOnChange={false}
                         onSubmit={(values, actions) => {
+                            setEditSuccess(false)
                             fetch(`/users/${user.id}`, {
                                 method: 'PATCH',
                                 headers: {
@@ -39,12 +41,16 @@ function ProfileTab({user}){
                                 body: JSON.stringify(values)
                             }).then((resp) => {
                                 if (resp.ok) {
-                                    resp.json().then(({ user }) => {
+                                    resp.json().then((user) => {
                                         console.log(user)
+                                        setUser(user)
+                                        setEditSuccess(true)
+                                        actions.setSubmitting(false)
                                         // navigate into site
                                     })
                                 } else { 
                                     actions.setSubmitting(false)
+                                    setLoginError(true)
                                 }
                             })
                         }}
@@ -106,7 +112,11 @@ function ProfileTab({user}){
                                 </Flex>
                                 {loginError && <Alert marginTop={4} status='error'>
                                     <AlertIcon />
-                                    <AlertTitle> 'Issue updating profile' </AlertTitle>
+                                    <AlertTitle> 'Error updating profile' </AlertTitle>
+                                </Alert>}
+                                {editSuccess && <Alert marginTop={4} status='success'>
+                                    <AlertIcon />
+                                    <AlertTitle> 'Profile Successfully Updated!' </AlertTitle>
                                 </Alert>}
                             </Form> 
                         )}

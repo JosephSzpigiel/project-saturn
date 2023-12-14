@@ -12,24 +12,23 @@ function App() {
   const [user, setUser] = useState(null)
   const [events, setEvents] = useState([])
   const [loaded, setLoaded] = useState(false)
-  const context = {user, events, setEvents}
+  const context = {user, setUser, events, setEvents}
 
   useEffect(() => {
     fetch('/authorized')
     .then((resp) => {
       if (resp.ok) {
         resp.json().then((user) => setUser(user))
-        setLoaded(true)
       } else {
         // handle what should happen if not logged in
         console.log('No login')
-        setLoaded(true)
       }
     }).then(()=>{
       fetch('/events')
       .then((resp)=>{
         if (resp.ok) {
           resp.json().then((events)=> setEvents(events))
+          setLoaded(true)
         }
       })
     })
@@ -40,7 +39,9 @@ function App() {
       return(
         <ChakraProvider>
           <Header user={user} setUser={setUser} />
-          <SignUp setUser={setUser} />
+          <div style={{'marginTop':'70px', 'marginLeft':'10px', 'marginRight':'10px', 'width':'1fr'}}>
+            <SignUp setUser={setUser} />          
+          </div>
       </ChakraProvider>
       )
     }

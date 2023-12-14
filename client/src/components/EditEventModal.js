@@ -40,7 +40,7 @@ function EditEventModal({isEditOpen, onEditClose, eventInfo, setEventInfo, setDa
 
     return(
 
-    <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered>
+    <Modal scrollBehavior='inside' isOpen={isEditOpen} onClose={onEditClose} isCentered>
         <ModalOverlay />
         <ModalContent>
             <ModalHeader>Edit {eventInfo.name}</ModalHeader>

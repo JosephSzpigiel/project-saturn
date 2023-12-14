@@ -4,7 +4,7 @@ import ProfileTab from "./ProfileTab"
 import CreatedEventsTab from "./CreatedEventsTab"
 
 function MyProfile(){
-    const {user} = useOutletContext()
+    const {user, setUser, setEvents} = useOutletContext()
 
     return(
         <>
@@ -47,10 +47,10 @@ function MyProfile(){
                     </TabList>
                     <TabPanels>
                         <TabPanel>
-                            <ProfileTab user={user}/>
+                            <ProfileTab user={user} setUser={setUser}/>
                         </TabPanel>
                         <TabPanel>
-                            <CreatedEventsTab user={user} />
+                            <CreatedEventsTab user={user} setUser={setUser} setEvents={setEvents}/>
                         </TabPanel>
                         <TabPanel>
                             <p>three!</p>
