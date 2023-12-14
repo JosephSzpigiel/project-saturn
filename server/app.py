@@ -107,8 +107,24 @@ class EventsById(Resource):
         if not event:
             return make_response({'error': 'event not found'}, 404)
         params = request.json
-        for attr in params:
-            setattr(event, attr, params[attr])
+        if params['start_time'].find('T') != -1:
+            date = params['start_time'].split('-')
+            time = date[2].split('T')[1]
+            hour= time.split(':')[0]
+            minutes= time.split(':')[1]
+            dateObj = datetime.datetime(int(date[0]), int(date[1]), int(date[2].split('T')[0]), int(hour), int(minutes))
+        else:
+            date = params['start_time'].split('-')
+            time = date[2].split(' ')[1]
+            hour= time.split(':')[0]
+            minutes= time.split(':')[1]
+            dateObj = datetime.datetime(int(date[0]), int(date[1]), int(date[2].split(' ')[0]), int(hour), int(minutes))
+        setattr(event, 'name', params['name'])
+        setattr(event, 'max_tickets', params['max_tickets'])
+        setattr(event, 'start_time', dateObj)
+        setattr(event, 'description', params['description'])
+        setattr(event, 'event_type_id', params['event_type_id'])
+        setattr(event, 'img_url', params['img_url'])
         db.session.commit()
         return make_response(event.to_dict(), 200)
     def delete(self,id):
@@ -135,17 +151,18 @@ class Registrations(Resource):
     
 api.add_resource(Registrations, '/api/v1/registrations')
 
-class RegistrationsById(Resource):
-    def delete(self, id):
-        registrations = Registration.query.filter_by(user_id = id).all()
-        if not registrations:
+class RegistrationsByEventIdUserId(Resource):
+    def delete(self, eventId, userId):
+        event_registrations = Registration.query.filter_by(event_id = eventId).all()
+        user_event_registrations = filter(lambda reg: reg.user_id == userId, event_registrations)
+        if not user_event_registrations:
             return make_response({'error': 'registration not found'}, 404)
-        for r in registrations: 
+        for r in user_event_registrations: 
             db.session.delete(r)
         db.session.commit()
         return make_response('',204)
 
-api.add_resource(RegistrationsById, '/api/v1/registrations/<int:id>')
+api.add_resource(RegistrationsByEventIdUserId, '/api/v1/registrations/<int:eventId>/<int:userId>')
 
 
 @app.route('/api/v1/login', methods=['POST'])

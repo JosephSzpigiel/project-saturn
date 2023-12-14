@@ -1,18 +1,26 @@
-import { Flex, Textarea, Spacer, ButtonGroup, Button, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Box, Heading, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle, Select  } from '@chakra-ui/react'
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    Alert,
+    AlertIcon,
+    FormControl,
+    FormLabel,
+    FormErrorMessage,
+    Select,
+    Textarea,
+    ModalCloseButton,
+    Input,
+    Button
+} from "@chakra-ui/react";
 import { Field, Form, Formik} from 'formik'
 import * as yup from 'yup'
-import { useState } from 'react'
-import { useOutletContext, useNavigate, NavLink } from 'react-router-dom'
 
-function EventForm(){
-    const [eventError, setEventError] = useState(false)
-
-    const {user} = useOutletContext()
-
-    const navigate = useNavigate()
-
+function EditEventModal({isEditOpen, onEditClose, eventInfo, setEventInfo, setDate, setTicketsLeft, ticketsSold}){
     const URL = /^((https?|ftp):\/\/)?(www.)?(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i
-
 
     const eventSchema = yup.object().shape({
         name: yup.string().max(15, 'Event name must be 15 characters or less').required('Event name is required!'),
@@ -20,7 +28,7 @@ function EventForm(){
         event_type_id: yup.number().required('Event Type is required!'),
         start_time: yup.date().required('Start Time is required!'),
         img_url: yup.string().matches(URL, 'Enter a valid url'),
-        max_tickets: yup.number().integer().positive('Tickets Available must be a positive number').required('Tickets are required!')
+        max_tickets: yup.number().integer().positive('Tickets Available must be a positive number').required('Tickets are required!').min(ticketsSold, 'Must have more tickets than sold!')
     })
 
     const today = new Date()
@@ -28,68 +36,49 @@ function EventForm(){
     const hours = today.getHours()
     const minutes = today.getMinutes()
     const todayString = `${today.getFullYear()}-${month}-${today.getDate()}T00:00`
-    console.log(todayString)
-
-    // const todayString = `${today.getFullYear()}-${month}-${today.getDate()}T${hours}:${minutes}`
 
 
-    return (
-        <>
-        <Breadcrumb m='10px' fontWeight='medium' fontSize='lg'>
-            <BreadcrumbItem>
-                <BreadcrumbLink as={NavLink} to='/'>
-                Home
-                </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbItem>
-                <BreadcrumbLink as={NavLink} to='/events'>
-                Events
-                </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbItem isCurrentPage>
-                <BreadcrumbLink>
-                    Event Form
-                </BreadcrumbLink>
-            </BreadcrumbItem>
-        </Breadcrumb>
-        <Flex>
-            <Spacer/>
-                <Flex direction='column'>
-                    <Heading m={3} size='lg' align='center'>Create an Event</Heading>
-                    <Formik
-                        initialValues={{
-                            name: '',
-                            description: '',
-                            created_by_id: user['id'],
-                            event_type_id: '',
-                            start_time: '',
-                            max_tickets: '',
-                            img_url: ''
-                        }}
-                        validationSchema={eventSchema}
-                        validateOnBlur={true}
-                        validateOnChange={false}
-                        onSubmit={values => {
-                            console.log(values)
-                            fetch('/events', {
-                                method: 'POST',
-                                headers: {
-                                    "Content-Type": 'application/json'
-                                },
-                                body: JSON.stringify(values)
-                            }).then(resp => {
-                                    if (resp.ok) {
-                                        resp.json().then(({ event }) => {
-                                            console.log(event)
-                                            navigate(`/events/${event.id}`, {state:{event}})
-                                    })
-                                }
+    return(
+
+    <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+            <ModalHeader>Edit {eventInfo.name}</ModalHeader>
+            <ModalCloseButton/>
+            <ModalBody pb={6}>
+                <Formik
+                    initialValues={{
+                        name: eventInfo['name'],
+                        img_url: eventInfo['img_url'],
+                        description: eventInfo['description'],
+                        event_type_id: eventInfo['event_type_id'],
+                        start_time: eventInfo['start_time'],
+                        max_tickets: eventInfo['max_tickets']
+                    }}
+                    validationSchema={eventSchema}
+                    validateOnBlur={true}
+                    validateOnChange={false}
+                    onSubmit={values => {
+                        console.log(values)
+                        fetch(`/events/${eventInfo['id']}`,{
+                            method: 'PATCH',
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(values)
+                        }).then(resp => {
+                            if (resp.ok){
+                                resp.json().then(event => {
+                                    setEventInfo(event)
+                                    setDate(new Date(event.start_time))
+                                    const ticketList = event.registrations.map(r => r.tickets)
+                                    const ticketsSold = ticketList.reduce((a,b) => a+b,0)
+                                    setTicketsLeft(event.max_tickets - ticketsSold)
+                                    onEditClose()
+                                })
                             }
-
-                            )
-                            //Navigate to specific event page
-                            // .then(resp => )
-                        }}
+                        })
+                    }}
                     >
                         {({ errors, isSubmitting }) => (
                             <Form>
@@ -171,24 +160,18 @@ function EventForm(){
                                         </FormControl>
                                     )}
                                 </Field>
-                                <Flex marginTop={4}>
-                                    <Spacer/>
-                                        <Button type='submit' isLoading={isSubmitting}>Submit</Button>
-                                    <Spacer/>
-                                </Flex>
-                                {eventError && <Alert marginTop={4} status='error'>
-                                    <AlertIcon />
-                                    <AlertTitle>Issue creating Event</AlertTitle>
-                                </Alert>}
-                            </Form> 
-                        )}
+                                <ModalFooter>
+                                    <Button type='submit' colorScheme='blue' mr={3}>
+                                        Edit
+                                    </Button>
+                                    <Button onClick={onEditClose}>Cancel</Button>
+                                </ModalFooter>
+                            </Form>)}
                     </Formik>
-                    
-                </Flex>
-            <Spacer/>
-        </Flex>
-        </>
+            </ModalBody>
+        </ModalContent>
+    </Modal>
     )
 }
 
-export default EventForm
+export default EditEventModal

@@ -1,4 +1,4 @@
-import { Flex, Spacer, ButtonGroup, Button, Box, Heading, Avatar } from '@chakra-ui/react'
+import { Flex, Spacer, ButtonGroup, Button, Box, Heading, Avatar, Menu, MenuButton, MenuItem, MenuList, HStack } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 
 function Header({user, setUser}) {
@@ -17,22 +17,29 @@ function Header({user, setUser}) {
     }
     
     return(
-        <Flex minWidth='max-content' alignItems='center' gap='2' bg='blue' height='60px'>
+        <Flex as="header" zIndex={100} position="fixed" w="100%" top={0} alignItems='center' gap='2' bg='blue' height='60px'>
             <Box p='2'>
                 <Heading size='md' textColor={'white'}>Registr</Heading>
             </Box>
             <Spacer />
             <div>
                 {user ? 
-                <div>
+                <HStack>
                     <ButtonGroup gap='2' m='11px'>
                         <Button onClick={()=>nav('/addevent')}>Create Event</Button>
-                        <Button onClick={handleLogout} colorScheme='teal'>Log out</Button>
                     </ButtonGroup>
-                    <Avatar as='button' onClick={()=>nav('/myprofile')} m='8px' size='md' name={user.first_name} src={user.img_url} />
-                </div>
+                    <Menu id='profile_menu'>
+                        <MenuButton>
+                            <Avatar marginRight='15px' size='md' name={user.first_name} src={user.img_url}/>
+                        </MenuButton>
+                        <MenuList>
+                            <MenuItem onClick={()=>nav('/myprofile')}>My Profile</MenuItem>
+                            <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                        </MenuList>
+                    </Menu>
+                </HStack>
                 :
-                <Button m='11px' colorScheme='teal'>Log in</Button>}
+                null}
             </div>
         </Flex>
     )

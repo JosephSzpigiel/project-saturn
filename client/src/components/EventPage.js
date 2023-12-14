@@ -1,20 +1,14 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {   Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper,
-    ModalCloseButton, useDisclosure, Image, Flex, Spacer, Box, Heading, Divider, Center, Badge, Text, Card, CardBody, CardFooter, CardHeader, Stack, Button, ButtonGroup, Skeleton, HStack, Input } from "@chakra-ui/react";
-import { useOutletContext } from "react-router-dom";
-import { Field, Form, Formik} from 'formik'
-import * as yup from 'yup'
+import {
+    Wrap,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    useDisclosure, Image, Heading, Divider, Center, Badge, Text, Card, CardBody, CardFooter, CardHeader, Stack, Button, ButtonGroup, Skeleton} from "@chakra-ui/react";
+import { useOutletContext, NavLink } from "react-router-dom";
+import EditEventModal from "./EditEventModal";
+import RegisterModal from "./RegisterModal";
 
 function EventPage(){
     const {eventId} = useParams()
@@ -23,8 +17,11 @@ function EventPage(){
     const location = useLocation()
     const {user} = useOutletContext()
     const [registered, setRegistered] = useState(false)
-    const [ticketsLeft, setTicketsLeft] = useState(0)
+    const [ticketsLeft, setTicketsLeft] = useState(100000000000)
+    const [ticketsSold, setTicketsSold] = useState(0)
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen: isEditOpen , onOpen: onEditOpen, onClose: onEditClose } = useDisclosure()
+
     const nav = useNavigate()
 
 
@@ -43,8 +40,10 @@ function EventPage(){
                     }
                     console.log(event.registrations)
                     const ticketList = event.registrations.map(r => r.tickets)
-                    const ticketsSold = ticketList.reduce((a,b) => a+b,0)
-                    setTicketsLeft(event.max_tickets - ticketsSold)
+                    const ticketsSoldInit = ticketList.reduce((a,b) => a+b,0)
+                    if(event.max_tickets){
+                        setTicketsLeft(event.max_tickets - ticketsSoldInit)
+                    }
                 })
                 }
             else {
@@ -53,15 +52,28 @@ function EventPage(){
             }})},[])
 
 
-        function handleCancel(){
-            fetch(`/registrations/${user.id}`, {
-                method: 'DELETE'
-            }).then((resp) => {
-                if (resp.ok) {
-                    nav(0)
+    function handleCancel(){
+        fetch(`/registrations/${eventInfo.id}/${user.id}`, {
+            method: 'DELETE'
+        }).then((resp) => {
+            if (resp.ok) {
+                setEventInfo(curr => {return({...curr, 'registrations': curr['registrations'].filter(r => r.user_id !== user.id) })})
+                setRegistered(false)
+                const ticketList = eventInfo.registrations.filter(r => r.user_id !== user.id).map(r => r.tickets)
+                const ticketsSold = ticketList.reduce((a,b) => a+b,0)
+                if(eventInfo.max_tickets){
+                    setTicketsLeft(eventInfo.max_tickets - ticketsSold)
                 }
-            })
-        }
+            }
+        })
+    }
+
+    function handleEdit(){
+        const ticketList = eventInfo.registrations.map(r => r.tickets)
+        setTicketsSold(ticketList.reduce((a,b) => a+b,0))
+        console.log(ticketsSold)
+        onEditOpen()
+    }
     
     const registerButton = (ticketsLeft ? 
         <Button onClick={onOpen} variant='solid' colorScheme='blue'>
@@ -74,6 +86,22 @@ function EventPage(){
 
     return (
         <>
+        <Breadcrumb m='10px' fontWeight='medium' fontSize='lg'>
+            <BreadcrumbItem>
+                <BreadcrumbLink as={NavLink} to='/'>
+                Home
+                </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbItem as={NavLink} to='/events'>
+                <BreadcrumbLink>Events</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbItem isCurrentPage>
+                <BreadcrumbLink>
+                    {eventInfo.name}
+                </BreadcrumbLink>
+            </BreadcrumbItem>
+        </Breadcrumb>
+
         <Center>
         <Card width = '70%'>
             <Skeleton fitContent={false} isLoaded>
@@ -87,33 +115,31 @@ function EventPage(){
                         src={eventInfo.img_url}
                         alt={eventInfo.name}
                         borderRadius='lg'
+                        fallbackSrc='https://via.placeholder.com/300'
                         />
                     </Center>
                 </Center>
 
-                <Stack mt='6' spacing='3'>
-                    <HStack>
+                <Stack mt='6' spacing='3' wrap={true}>
+                    <Wrap justify='center'>
                         <Badge borderRadius='full' px='5' colorScheme='teal'>
                             {eventInfo.event_type.type_name}
                         </Badge>
                         <Badge borderRadius='full' px='5' colorScheme='green'>
                             Host: {eventInfo.created_by.first_name} {eventInfo.created_by.last_name}
                         </Badge>
-                        <Badge borderRadius='full' px='5' colorScheme='blue'>
+                        {eventInfo.max_tickets ? <Badge borderRadius='full' px='5' colorScheme='blue'>
                             Tickets Left: {ticketsLeft} of {eventInfo.max_tickets}
-                        </Badge>
-                    </HStack>
+                        </Badge>:null}
+                    </Wrap>
                     <Text>
                         {eventInfo.description}
-                    </Text>
-                    <Text color='blue.600' fontSize='2xl'>
-                        $450
                     </Text>
                 </Stack>
             </CardBody>
             <Divider />
-            <CardFooter>
-                <ButtonGroup spacing='2'>
+            <CardFooter justify='center'>
+                <Wrap spacing='2' justify='center'>
                     {
                         !registered ? 
                         registerButton:
@@ -124,83 +150,21 @@ function EventPage(){
 
                 {user.id === eventInfo.created_by_id ?
                     <ButtonGroup spacing='2'>
-                        <Button variant='ghost' colorScheme='blue'>
+                        <Button variant='outline' colorScheme='blue'>
                             View Attending
                         </Button>
-                        <Button>
+                        <Button variant='outline' colorScheme='blue' onClick={handleEdit}>
                             Edit Event Info
                         </Button>
                     </ButtonGroup>: null}
-                </ButtonGroup>                  
+                </Wrap>                  
             </CardFooter>
         </Skeleton>
         </Card>
         </Center>
 
-        <Modal isOpen={isOpen} onClose={onClose} isCentered>
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>Register for {eventInfo.name}</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody pb={6}>
-                <Formik
-                        initialValues={{
-                            event_id: eventInfo['id'],
-                            user_id: user['id'],
-                            tickets: 1,
-                        }}
-                        onSubmit={values => {
-                            console.log(values)
-                            fetch('/registrations', {
-                                method: 'POST',
-                                headers: {
-                                    "Content-Type": 'application/json'
-                                },
-                                body: JSON.stringify(values)
-                            }).then(resp => {
-                                    if (resp.ok) {
-                                        resp.json().then(( registration ) => {
-                                            console.log(registration)
-                                            setEventInfo(curr => {
-                                                return {...curr, 'registrations':[...curr.registrations, registration]}
-                                            }
-                                            )
-                                            setRegistered(true)
-                                            setTicketsLeft(curr => curr - registration.tickets)
-                                            onClose()
-                                    })
-                                }
-                            }
-                            )
-                        }}
-                    >
-                        {({ errors, isSubmitting }) => (
-                            <Form>
-                                <Field name='tickets'>
-                                    {({ field, form }) => (
-                                        <NumberInput onChange={(val) =>
-                                            form.setFieldValue(field.name, val)
-                                        } defaultValue={1} min={1} max={ticketsLeft} precision={0}>
-                                            <NumberInputField {...field}/>
-                                                <NumberInputStepper>
-                                                    <NumberIncrementStepper />
-                                                    <NumberDecrementStepper />
-                                                </NumberInputStepper>
-                                        </NumberInput>                
-                                    )}
-                                </Field>
-                            <ModalFooter>
-                                <Button type='submit' colorScheme='blue' mr={3}>
-                                    Register
-                                </Button>
-                                <Button onClick={onClose}>Cancel</Button>
-                            </ModalFooter>
-                            </Form>)}
-                </Formik>
-                </ModalBody>
-
-            </ModalContent>
-        </Modal>
+        <EditEventModal ticketsSold={ticketsSold} isEditOpen={isEditOpen} onEditClose={onEditClose} eventInfo={eventInfo} setDate={setDate} setTicketsLeft={setTicketsLeft} setEventInfo={setEventInfo}/>
+        <RegisterModal ticketsLeft={ticketsLeft} setEventInfo={setEventInfo} isOpen={isOpen} onClose={onClose} eventInfo={eventInfo} user={user} setRegistered={setRegistered} setTicketsLeft={setTicketsLeft}/>
         </>
         )        
     }

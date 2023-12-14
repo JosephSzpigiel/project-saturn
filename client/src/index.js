@@ -8,6 +8,7 @@ import HomePage from "./components/HomePage";
 import EventForm from "./components/EventForm";
 import EventPage from "./components/EventPage";
 import MyProfile from "./components/MyProfile";
+import EventsPage from "./components/EventsPage";
 
 const routes = [
     {
@@ -28,6 +29,10 @@ const routes = [
                 path: '/myprofile',
                 element: <MyProfile />,
             },
+            {
+                path: '/events',
+                element: <EventsPage />
+            }
         ],
     },
 ];
