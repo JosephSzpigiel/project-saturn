@@ -71,6 +71,16 @@ class Notifications(Resource):
 
 api.add_resource(Notifications, '/api/v1/notifications')
 
+class NotificationsByUser(Resource):
+    def delete(self, id):
+        notes = Notification.query.filter_by(user_id=id)
+        for note in notes:
+            db.session.delete(note)
+        db.session.commit()
+        return make_response('', 204)
+
+api.add_resource(NotificationsByUser, '/api/v1/notificationsbyuser/<int:id>')
+
 @app.route('/api/v1/authorized')
 def authorized():
     try:
