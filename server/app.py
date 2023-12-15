@@ -10,7 +10,7 @@ import datetime
 # Local imports
 from config import app, db, api
 # Add your model imports
-from models import User, UserType, Event, EventType, Registration
+from models import User, Notification, UserType, Event, EventType, Registration
 
 
 # Views go here!
@@ -57,6 +57,19 @@ class Events(Resource):
 
 api.add_resource(Events, '/api/v1/events')
 api.add_resource(Users, '/api/v1/users')
+
+class Notifications(Resource):
+    def post(self):
+        params = request.json
+        notificationObj = Notification(
+            user_id =  params['user_id'],
+            content = params['content'],
+        )
+        db.session.add(notificationObj)
+        db.session.commit()
+        return make_response(notificationObj.to_dict(), 201)
+
+api.add_resource(Notifications, '/api/v1/notifications')
 
 @app.route('/api/v1/authorized')
 def authorized():

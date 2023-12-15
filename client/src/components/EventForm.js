@@ -7,7 +7,7 @@ import { useOutletContext, useNavigate, NavLink } from 'react-router-dom'
 function EventForm(){
     const [eventError, setEventError] = useState(false)
 
-    const {user, setUser, setEvents} = useOutletContext()
+    const {user, setUser, setEvents, setMyCreatedIds} = useOutletContext()
 
     const navigate = useNavigate()
 
@@ -82,9 +82,11 @@ function EventForm(){
                                         resp.json().then(({ event }) => {
                                             console.log(event)
                                             setEvents(curr => [...curr, event])
-                                            setUser(curr => {return {...curr, 'events_created':[...curr['events_created'], event]}})
+                                            setMyCreatedIds(curr =>  [...curr, event.id])
                                             navigate(`/events/${event.id}`, {state:{event}})
                                     })
+                                }else{
+                                    setEventError(true)
                                 }
                             }
 

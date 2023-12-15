@@ -15,7 +15,7 @@ import {
     Td,
 } from "@chakra-ui/react";
 
-function RegistrationsModal({user, setTicketsLeft, setRegistered, eventInfo, setEventInfo, isRegistrationsOpen, onRegistrationsClose}){
+function RegistrationsModal({user, setTicketsLeft, setRegistered, eventInfo, setEventInfo, isRegistrationsOpen, onRegistrationsClose, setMyRegisteredIds}){
     
     function handleCancel(registrationId,userId){
         fetch(`/registrations/${registrationId}`, {
@@ -25,6 +25,7 @@ function RegistrationsModal({user, setTicketsLeft, setRegistered, eventInfo, set
                 setEventInfo(curr => {return({...curr, 'registrations': curr['registrations'].filter(r => r.id !== registrationId)})})
                 if(user.id === userId){
                     setRegistered(false)
+                    setMyRegisteredIds(curr => [...curr].filter(id => id !== eventInfo.id))
                 }
                 const ticketList = eventInfo.registrations.filter(r => r.id !== registrationId).map(r => r.tickets)
                 const ticketsSold = ticketList.reduce((a,b) => a+b,0)

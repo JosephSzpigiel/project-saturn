@@ -4,7 +4,7 @@ import EditEventModal from "./EditEventModal";
 import RegistrationsModal from "./RegistrationsModal";
 import { useNavigate } from "react-router-dom";
 
-function CreatedEventsTabRow({event, setEvents, user, setUser}){
+function CreatedEventsTabRow({event, setEvents, user, setUser, setMyCreatedIds, setMyRegisteredIds}){
 
     const { isOpen: isEditOpen , onOpen: onEditOpen, onClose: onEditClose } = useDisclosure()
     const { isOpen: isRegistrationsOpen , onOpen: onRegistrationsOpen, onClose: onRegistrationsClose } = useDisclosure()
@@ -23,8 +23,9 @@ function CreatedEventsTabRow({event, setEvents, user, setUser}){
             method: 'DELETE'
         }).then((resp) => {
             if (resp.ok) {
-                setUser(curr => {return({...curr, 'events_created': curr['events_created'].filter(listEvent => listEvent.id !== event.id)})})
                 setEvents(curr => {return([...curr.filter(listEvent => listEvent.id !== event.id)])})
+                setMyCreatedIds(curr => [...curr].filter(id => id !== event.id))
+                setMyRegisteredIds(curr => [...curr].filter(id => id !== event.id))
             }
         })
     }
@@ -46,7 +47,7 @@ function CreatedEventsTabRow({event, setEvents, user, setUser}){
                 <Td><Button onClick={()=> nav(`/events/${event.id}`)}>View</Button></Td>
                 <Td><Button onClick={onEditOpen}>Edit</Button></Td>
                 <Td><Button onClick={()=>handleDelete(event)}>Cancel</Button></Td>
-                <RegistrationsModal user={user} setTicketsLeft={setTicketsLeft} setRegistered={setRegistered}eventInfo={eventInfo} setEventInfo={setEventInfo} isRegistrationsOpen={isRegistrationsOpen} onRegistrationsClose={onRegistrationsClose}/>
+                <RegistrationsModal user={user} setMyRegisteredIds={setMyRegisteredIds} setTicketsLeft={setTicketsLeft} setRegistered={setRegistered}eventInfo={eventInfo} setEventInfo={setEventInfo} isRegistrationsOpen={isRegistrationsOpen} onRegistrationsClose={onRegistrationsClose}/>
                 <EditEventModal ticketsSold={ticketsSold} isEditOpen={isEditOpen} onEditClose={onEditClose} eventInfo={eventInfo} setDate={setDate} setTicketsLeft={setTicketsLeft} setEventInfo={setEventInfo}/>
             </Tr>
     )

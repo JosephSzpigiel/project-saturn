@@ -2,9 +2,10 @@ import { useOutletContext, NavLink } from "react-router-dom"
 import { Grid, GridItem, Heading, Center, Tabs, TabPanels, Tab, TabList, TabPanel, Button, Avatar, Breadcrumb, BreadcrumbItem, BreadcrumbLink, HStack, Box } from "@chakra-ui/react"
 import ProfileTab from "./ProfileTab"
 import CreatedEventsTab from "./CreatedEventsTab"
+import RegisteredEventsTab from "./RegisteredEventsTab"
 
 function MyProfile(){
-    const {user, setUser, setEvents} = useOutletContext()
+    const {user, setUser, events, setEvents, myCreatedIds, setMyCreatedIds, myRegisteredIds, setMyRegisteredIds} = useOutletContext()
 
     return(
         <>
@@ -50,10 +51,10 @@ function MyProfile(){
                             <ProfileTab user={user} setUser={setUser}/>
                         </TabPanel>
                         <TabPanel>
-                            <CreatedEventsTab user={user} setUser={setUser} setEvents={setEvents}/>
+                            <CreatedEventsTab user={user} events={events} setUser={setUser} setEvents={setEvents} myCreatedIds={myCreatedIds} setMyCreatedIds={setMyCreatedIds} setMyRegisteredIds={setMyRegisteredIds}/>
                         </TabPanel>
                         <TabPanel>
-                            <p>three!</p>
+                            <RegisteredEventsTab events={events} user={user} setUser={setUser} setEvents={setEvents} myCreatedIds={myCreatedIds} setMyCreatedIds={setMyCreatedIds} myRegisteredIds={myRegisteredIds} setMyRegisteredIds={setMyRegisteredIds}/>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

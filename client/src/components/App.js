@@ -11,14 +11,24 @@ function App() {
 
   const [user, setUser] = useState(null)
   const [events, setEvents] = useState([])
+  const [myRegisteredIds, setMyRegisteredIds]  = useState([])
+  const [myCreatedIds, setMyCreatedIds]  = useState([])
+
   const [loaded, setLoaded] = useState(false)
-  const context = {user, setUser, events, setEvents}
+  const context = {user, setUser, events, setEvents, myRegisteredIds, setMyRegisteredIds, myCreatedIds, setMyCreatedIds}
 
   useEffect(() => {
     fetch('/authorized')
     .then((resp) => {
       if (resp.ok) {
-        resp.json().then((user) => setUser(user))
+        resp.json().then(
+          (userObj) => {
+            setUser(userObj)
+            console.log(userObj['events_created'])
+            setMyCreatedIds(userObj['events_created'].map(e => e.id))
+            setMyRegisteredIds(userObj['registrations'].map(r => r.event_id))
+          }
+          )
       } else {
         // handle what should happen if not logged in
         console.log('No login')

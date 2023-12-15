@@ -15,16 +15,13 @@ function EventPage(){
     const {eventId} = useParams()
     const [eventInfo, setEventInfo] = useState({created_by:{first_name: '', last_name: ''}, event_type:{type_name: ''}, registrations:[]})
     const [date, setDate] = useState('')
-    const {user, setUser} = useOutletContext()
+    const {user, setUser, setEvents, myRegisteredIds, setMyRegisteredIds} = useOutletContext()
     const [registered, setRegistered] = useState(false)
     const [ticketsLeft, setTicketsLeft] = useState(100000000000)
     const [ticketsSold, setTicketsSold] = useState(0)
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isEditOpen , onOpen: onEditOpen, onClose: onEditClose } = useDisclosure()
     const { isOpen: isRegistrationsOpen , onOpen: onRegistrationsOpen, onClose: onRegistrationsClose } = useDisclosure()
-
-
-    const nav = useNavigate()
 
 
     useEffect(() => {
@@ -35,12 +32,10 @@ function EventPage(){
                 .then((event) => {
                     setEventInfo(event)
                     setDate(new Date(event.start_time))
-                    const registeredIds = event.registrations.map(r => r.user_id)
-                    console.log(registeredIds)
-                    if( registeredIds.filter(id => id === user.id).length !== 0){
+                    console.log(myRegisteredIds)
+                    if( myRegisteredIds.filter(id => id === event.id).length !== 0){
                         setRegistered(true)
                     }
-                    console.log(event.registrations)
                     const ticketList = event.registrations.map(r => r.tickets)
                     const ticketsSoldInit = ticketList.reduce((a,b) => a+b,0)
                     if(event.max_tickets){
@@ -61,6 +56,7 @@ function EventPage(){
             if (resp.ok) {
                 setEventInfo(curr => {return({...curr, 'registrations': curr['registrations'].filter(r => r.user_id !== user.id) })})
                 setRegistered(false)
+                setMyRegisteredIds(curr=> [...curr].filter(id => id !== eventInfo.id))
                 const ticketList = eventInfo.registrations.filter(r => r.user_id !== user.id).map(r => r.tickets)
                 const ticketsSold = ticketList.reduce((a,b) => a+b,0)
                 if(eventInfo.max_tickets){
@@ -173,8 +169,8 @@ function EventPage(){
         </Center>
 
         <EditEventModal ticketsSold={ticketsSold} isEditOpen={isEditOpen} onEditClose={onEditClose} eventInfo={eventInfo} setDate={setDate} setTicketsLeft={setTicketsLeft} setEventInfo={setEventInfo}/>
-        <RegisterModal ticketsLeft={ticketsLeft} setEventInfo={setEventInfo} isOpen={isOpen} onClose={onClose} eventInfo={eventInfo} user={user} setRegistered={setRegistered} setTicketsLeft={setTicketsLeft}/>
-        <RegistrationsModal user={user} setTicketsLeft={setTicketsLeft} setRegistered={setRegistered}eventInfo={eventInfo} setEventInfo={setEventInfo} isRegistrationsOpen={isRegistrationsOpen} onRegistrationsClose={onRegistrationsClose}/>
+        <RegisterModal setEvents={setEvents} setMyRegisteredIds={setMyRegisteredIds} ticketsLeft={ticketsLeft} setEventInfo={setEventInfo} isOpen={isOpen} onClose={onClose} eventInfo={eventInfo} user={user} setRegistered={setRegistered} setTicketsLeft={setTicketsLeft}/>
+        <RegistrationsModal user={user} setMyRegisteredIds={setMyRegisteredIds} setTicketsLeft={setTicketsLeft} setRegistered={setRegistered}eventInfo={eventInfo} setEventInfo={setEventInfo} isRegistrationsOpen={isRegistrationsOpen} onRegistrationsClose={onRegistrationsClose}/>
         </>
         )        
     }

@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardBody, CardFooter, Image, Stack, Text, Divider, Button, ButtonGroup, Heading } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 
-function EventCard({event, user, setUser, setEvents}){
+function EventCard({event, user, setUser, setEvents, setMyCreatedIds, setMyRegisteredIds}){
 
     const nav = useNavigate()
 
@@ -11,7 +11,8 @@ function EventCard({event, user, setUser, setEvents}){
         }).then((resp) => {
             if (resp.ok) {
                 setEvents(curr => {return([...curr.filter(listEvent => listEvent.id !== event.id)])})
-                setUser(curr => {return({...curr, 'events_created': curr['events_created'].filter(listEvent => listEvent.id !== event.id)})})
+                setMyCreatedIds(curr => [...curr].filter(id => id !== event.id))
+                setMyRegisteredIds(curr => [...curr].filter(id => id !== event.id))
             }
         })
     }

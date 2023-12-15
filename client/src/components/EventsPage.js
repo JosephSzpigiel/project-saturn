@@ -3,9 +3,9 @@ import EventCard from "./EventCard";
 import { Container, Wrap, Center, Heading,Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 
 function EventsPage(){
-    const {user, setUser, events, setEvents} = useOutletContext()
+    const {user, setUser, events, setEvents, setMyCreatedIds, setMyRegisteredIds} = useOutletContext()
 
-    const eventCards = events.map(event => <EventCard key={event.id} setUser={setUser} event={event} setEvents={setEvents} user={user}/>)
+    const eventCards = events.map(event => <EventCard setMyRegisteredIds={setMyRegisteredIds} setMyCreatedIds={setMyCreatedIds} key={event.id} setUser={setUser} event={event} setEvents={setEvents} user={user}/>)
 
     return(
         <>

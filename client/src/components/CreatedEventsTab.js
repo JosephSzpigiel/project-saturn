@@ -14,12 +14,15 @@ import {
 import CreatedEventsTabRow from './CreatedEventsTabRow'
 
 
-function CreatedEventsTab({user, setUser, setEvents}){
+function CreatedEventsTab({user, setUser, events, setEvents, myCreatedIds, setMyCreatedIds, setMyRegisteredIds}){
 
-    console.log(user.events_created)
 
-    const createdRows = user.events_created.map(event =>  {
-        return (<CreatedEventsTabRow key={event.id} event={event} user={user} setUser={setUser} setEvents={setEvents}/>)
+
+    const createdRows = myCreatedIds.map(id =>  {
+        const event = events.filter(e => e.id == id)[0]
+        if (event){
+            return (<CreatedEventsTabRow key={event.id} event={event} user={user} setUser={setUser} setEvents={setEvents} myCreatedIds={myCreatedIds} setMyCreatedIds={setMyCreatedIds} setMyRegisteredIds={setMyRegisteredIds}/>)
+        }
     })
 
     console.log(createdRows)

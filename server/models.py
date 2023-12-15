@@ -20,6 +20,7 @@ class User(db.Model, SerializerMixin):
     events_created = db.relationship('Event', back_populates = 'created_by', cascade = 'all, delete-orphan')
     events_registered = association_proxy('registrations', 'event')
     user_type = db.relationship('UserType', back_populates='users')
+    notifications = db.relationship('Notification', back_populates = 'user', cascade = 'all, delete-orphan')
     serialize_rules = ('-events_registered.users',
                         '-events_registered.created_by',
                         '-events_created.created_by',
@@ -101,3 +102,12 @@ class UserType(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key = True)
     type_name =db.Column(db.String)
     users = db.relationship('User', back_populates = 'user_type')
+
+class Notification(db.Model, SerializerMixin):
+    __tablename__ =  'notifications'
+
+    id = db.Column(db.Integer, primary_key = True)
+    content =db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', back_populates = 'notifications')
+    serialize_rules = ('-user',)
