@@ -5,15 +5,7 @@ import {
     ModalHeader,
     ModalFooter,
     ModalBody,
-    Alert,
-    AlertIcon,
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
-    Select,
-    Textarea,
     ModalCloseButton,
-    Input,
     Button,
     NumberInput,
     NumberInputField,
@@ -24,7 +16,7 @@ import {
 import { Field, Form, Formik} from 'formik'
 import * as yup from 'yup'
 
-function RegisterModal({isOpen, ticketsLeft, setEventInfo, onClose, eventInfo, user, setRegistered, setTicketsLeft}){
+function RegisterModal({isOpen, setEvents, ticketsLeft, setEventInfo, onClose, eventInfo, user, setRegistered, setTicketsLeft, setMyRegisteredIds}){
     return(
         <Modal isOpen={isOpen} onClose={onClose} isCentered>
             <ModalOverlay />
@@ -54,8 +46,30 @@ function RegisterModal({isOpen, ticketsLeft, setEventInfo, onClose, eventInfo, u
                                                 return {...curr, 'registrations':[...curr.registrations, registration]}
                                             }
                                             )
+                                            setEvents(curr => {return([...curr.map(listEvent => {
+                                                if(listEvent.id == eventInfo.id){
+                                                    return (
+                                                        {...listEvent, 'registrations': [...listEvent['registrations'], registration]}
+                                                    )
+                                                }else{
+                                                    return listEvent
+                                                }
+                                            })])})
                                             setRegistered(true)
+                                            setMyRegisteredIds(curr => [...curr, eventInfo.id])
                                             setTicketsLeft(curr => curr - registration.tickets)
+                                            fetch('/notifications',{
+                                                method: 'POST',
+                                                headers: {
+                                                    "Content-Type": 'application/json'
+                                                },
+                                                body: JSON.stringify({
+                                                    'user_id': eventInfo.created_by.id, 
+                                                    'content': `${user.first_name} registered for ${eventInfo.name}`,
+                                                    'type': 'registration'
+                                                })
+                                            })
+                    
                                             onClose()
                                     })
                                 }

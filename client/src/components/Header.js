@@ -1,8 +1,11 @@
-import { Flex, Spacer, ButtonGroup, Button, Box, Heading, Avatar, Menu, MenuButton, MenuItem, MenuList, HStack } from '@chakra-ui/react'
+import { Flex,Popover, useDisclosure, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody, PopoverHeader, Spacer, ButtonGroup, Button, Box, Heading, Avatar,  AvatarBadge, Menu, MenuButton, MenuItem, MenuList, HStack, MenuDivider } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+
+import NotificationsModal from './NotificationsModal'
 
 function Header({user, setUser}) {
-
+    const { onOpen, onClose, isOpen } = useDisclosure()
     const nav = useNavigate()
 
     function handleLogout() {
@@ -15,6 +18,14 @@ function Header({user, setUser}) {
             }
         })
     }
+
+    const [notes, setNotes] = useState([])
+
+    useEffect(()=> {
+        if(user){
+            setNotes(user.notifications)
+        }
+    },[user])
     
     return(
         <Flex as="header" zIndex={100} position="fixed" w="100%" top={0} alignItems='center' gap='2' bg='blue' height='60px'>
@@ -30,17 +41,21 @@ function Header({user, setUser}) {
                     </ButtonGroup>
                     <Menu id='profile_menu'>
                         <MenuButton>
-                            <Avatar marginRight='15px' size='md' name={user.first_name} src={user.img_url}/>
+                            <Avatar marginRight='15px' size='md' name={user.first_name} src={user.img_url}>
+                                {notes.length != 0 ? <AvatarBadge boxSize='1em' bg='green.500' border={'2px solid white'}/>:null}
+                            </Avatar>
                         </MenuButton>
                         <MenuList>
                             <MenuItem onClick={()=>nav('/myprofile')}>My Profile</MenuItem>
                             <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                            {notes.length != 0 ? <MenuItem onClick={onOpen}>Notifications</MenuItem>: null}
                         </MenuList>
                     </Menu>
                 </HStack>
                 :
                 null}
             </div>
+            <NotificationsModal user={user} setUser={setUser} notes={notes} onClose={onClose} isOpen={isOpen}/>
         </Flex>
     )
 }

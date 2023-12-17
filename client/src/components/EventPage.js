@@ -1,4 +1,4 @@
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
     Wrap,
@@ -9,20 +9,19 @@ import {
 import { useOutletContext, NavLink } from "react-router-dom";
 import EditEventModal from "./EditEventModal";
 import RegisterModal from "./RegisterModal";
+import RegistrationsModal from "./RegistrationsModal"
 
 function EventPage(){
     const {eventId} = useParams()
-    const [eventInfo, setEventInfo] = useState({created_by:{first_name: '', last_name: ''}, event_type:{type_name: ''}})
-    const [date, setDate] = useState('')
-    const location = useLocation()
-    const {user} = useOutletContext()
+    const [eventInfo, setEventInfo] = useState({created_by:{first_name: '', last_name: ''}, event_type:{type_name: ''}, registrations:[]})
+    const {user, setUser, setEvents, myRegisteredIds, setMyRegisteredIds} = useOutletContext()
+    const [loaded, setLoaded] = useState(false)
     const [registered, setRegistered] = useState(false)
     const [ticketsLeft, setTicketsLeft] = useState(100000000000)
     const [ticketsSold, setTicketsSold] = useState(0)
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isEditOpen , onOpen: onEditOpen, onClose: onEditClose } = useDisclosure()
-
-    const nav = useNavigate()
+    const { isOpen: isRegistrationsOpen , onOpen: onRegistrationsOpen, onClose: onRegistrationsClose } = useDisclosure()
 
 
     useEffect(() => {
@@ -32,18 +31,16 @@ function EventPage(){
                 resp.json()
                 .then((event) => {
                     setEventInfo(event)
-                    setDate(new Date(event.start_time))
-                    const registeredIds = event.registrations.map(r => r.user_id)
-                    console.log(registeredIds)
-                    if( registeredIds.filter(id => id === user.id).length !== 0){
+                    console.log(myRegisteredIds)
+                    if( myRegisteredIds.filter(id => id === event.id).length !== 0){
                         setRegistered(true)
                     }
-                    console.log(event.registrations)
                     const ticketList = event.registrations.map(r => r.tickets)
                     const ticketsSoldInit = ticketList.reduce((a,b) => a+b,0)
                     if(event.max_tickets){
                         setTicketsLeft(event.max_tickets - ticketsSoldInit)
                     }
+                    setLoaded(true)
                 })
                 }
             else {
@@ -59,11 +56,23 @@ function EventPage(){
             if (resp.ok) {
                 setEventInfo(curr => {return({...curr, 'registrations': curr['registrations'].filter(r => r.user_id !== user.id) })})
                 setRegistered(false)
+                setMyRegisteredIds(curr=> [...curr].filter(id => id !== eventInfo.id))
                 const ticketList = eventInfo.registrations.filter(r => r.user_id !== user.id).map(r => r.tickets)
                 const ticketsSold = ticketList.reduce((a,b) => a+b,0)
                 if(eventInfo.max_tickets){
                     setTicketsLeft(eventInfo.max_tickets - ticketsSold)
                 }
+                fetch('/notifications',{
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'user_id': eventInfo.created_by.id, 
+                        'content': `${user.first_name} cancelled for ${eventInfo.name}`,
+                        'type': 'cancellation'
+                    })
+                })
             }
         })
     }
@@ -74,6 +83,11 @@ function EventPage(){
         console.log(ticketsSold)
         onEditOpen()
     }
+
+    function handleRegistrations(){
+        console.log(eventInfo)
+        onRegistrationsOpen()
+    }
     
     const registerButton = (ticketsLeft ? 
         <Button onClick={onOpen} variant='solid' colorScheme='blue'>
@@ -82,6 +96,25 @@ function EventPage(){
         <Button variant='solid' colorScheme='blue' isDisabled={true}>
             Sold Out
         </Button>)
+
+    let dateString = ``
+    let timeString = ``
+    if(loaded){
+        const date = new Date(eventInfo.start_time).toString().split(' ')
+        const weekday = date[0]
+        const month = date[1]
+        const day = date[2]
+        const year = date[3]
+        const time = date[4].split(':')
+        const hour = time[0]
+        const amPmHour = hour > 12 ? hour - 12 : hour
+        const amPmHourNonZero = amPmHour === '00' ? 12 : amPmHour
+        const amPm = hour > 12 ? 'PM' : 'AM'
+        const minutes = time[1]
+        dateString = `Date: ${weekday} ${month} ${day}, ${year}`
+        timeString = `Time: ${amPmHourNonZero}:${minutes} ${amPm}`
+    }
+
 
 
     return (
@@ -92,8 +125,10 @@ function EventPage(){
                 Home
                 </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbItem as={NavLink} to='/events'>
-                <BreadcrumbLink>Events</BreadcrumbLink>
+            <BreadcrumbItem>
+                <BreadcrumbLink as={NavLink} to='/events'>
+                    Events
+                </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbItem isCurrentPage>
                 <BreadcrumbLink>
@@ -103,17 +138,20 @@ function EventPage(){
         </Breadcrumb>
 
         <Center>
-        <Card width = '70%'>
+        <Card width = '90%' maxWidth={'600px'}>
             <Skeleton fitContent={false} isLoaded>
             <Heading m={3} size='lg' align='center'>{eventInfo.name}</Heading>
             <Divider/>
-            <Heading m={3} size='sm' align='center'>{date.toString()}</Heading>
+            <Heading m={3} size='sm' align='center'>{dateString}</Heading>
+            <Heading m={3} size='sm' align='center'>{timeString}</Heading>
+
             <CardBody>
                 <Center>
                     <Center width='80%'>
                         <Image
                         src={eventInfo.img_url}
                         alt={eventInfo.name}
+                        maxHeight={'30vh'}
                         borderRadius='lg'
                         fallbackSrc='https://via.placeholder.com/300'
                         />
@@ -150,8 +188,8 @@ function EventPage(){
 
                 {user.id === eventInfo.created_by_id ?
                     <ButtonGroup spacing='2'>
-                        <Button variant='outline' colorScheme='blue'>
-                            View Attending
+                        <Button variant='outline' colorScheme='blue' onClick={handleRegistrations}>
+                            View Registered
                         </Button>
                         <Button variant='outline' colorScheme='blue' onClick={handleEdit}>
                             Edit Event Info
@@ -163,8 +201,9 @@ function EventPage(){
         </Card>
         </Center>
 
-        <EditEventModal ticketsSold={ticketsSold} isEditOpen={isEditOpen} onEditClose={onEditClose} eventInfo={eventInfo} setDate={setDate} setTicketsLeft={setTicketsLeft} setEventInfo={setEventInfo}/>
-        <RegisterModal ticketsLeft={ticketsLeft} setEventInfo={setEventInfo} isOpen={isOpen} onClose={onClose} eventInfo={eventInfo} user={user} setRegistered={setRegistered} setTicketsLeft={setTicketsLeft}/>
+        <EditEventModal setEvents={setEvents} ticketsSold={ticketsSold} isEditOpen={isEditOpen} onEditClose={onEditClose} eventInfo={eventInfo} setTicketsLeft={setTicketsLeft} setEventInfo={setEventInfo}/>
+        <RegisterModal setEvents={setEvents} setMyRegisteredIds={setMyRegisteredIds} ticketsLeft={ticketsLeft} setEventInfo={setEventInfo} isOpen={isOpen} onClose={onClose} eventInfo={eventInfo} user={user} setRegistered={setRegistered} setTicketsLeft={setTicketsLeft}/>
+        <RegistrationsModal user={user} setMyRegisteredIds={setMyRegisteredIds} setTicketsLeft={setTicketsLeft} setRegistered={setRegistered}eventInfo={eventInfo} setEventInfo={setEventInfo} isRegistrationsOpen={isRegistrationsOpen} onRegistrationsClose={onRegistrationsClose}/>
         </>
         )        
     }

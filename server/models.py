@@ -20,6 +20,7 @@ class User(db.Model, SerializerMixin):
     events_created = db.relationship('Event', back_populates = 'created_by', cascade = 'all, delete-orphan')
     events_registered = association_proxy('registrations', 'event')
     user_type = db.relationship('UserType', back_populates='users')
+    notifications = db.relationship('Notification', back_populates = 'user', cascade = 'all, delete-orphan')
     serialize_rules = ('-events_registered.users',
                         '-events_registered.created_by',
                         '-events_created.created_by',
@@ -65,7 +66,7 @@ class Event(db.Model, SerializerMixin):
     users = association_proxy('regstrations', 'user')
     created_by = db.relationship('User', back_populates ='events_created')
     event_type = db.relationship('EventType', back_populates='events')
-    serialize_rules = ('-users.events_registered','-users.events_created'
+    serialize_rules = ('-users',
                         '-created_by.events_registered', '-created_by.events_created',
                         '-registrations.event', '-event_type.events')
 
@@ -83,7 +84,7 @@ class Registration(db.Model, SerializerMixin):
     tickets = db.Column(db.Integer)
     user = db.relationship('User', back_populates = 'registrations')
     event = db.relationship('Event', back_populates = 'registrations')
-    serialize_rules = ('-user', '-event')
+    serialize_rules = ('-user.events_registered',  '-user.events_created', '-user.registrations', '-event')
 
     def __repr__(self):
         return f'<Registration {self.id}: User {self.user_id}, Event {self.event_id}>'
@@ -101,3 +102,13 @@ class UserType(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key = True)
     type_name =db.Column(db.String)
     users = db.relationship('User', back_populates = 'user_type')
+
+class Notification(db.Model, SerializerMixin):
+    __tablename__ =  'notifications'
+
+    id = db.Column(db.Integer, primary_key = True)
+    content =db.Column(db.String)
+    type = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', back_populates = 'notifications')
+    serialize_rules = ('-user',)

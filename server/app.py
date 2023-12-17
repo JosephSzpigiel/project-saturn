@@ -10,7 +10,7 @@ import datetime
 # Local imports
 from config import app, db, api
 # Add your model imports
-from models import User, UserType, Event, EventType, Registration
+from models import User, Notification, UserType, Event, EventType, Registration
 
 
 # Views go here!
@@ -57,6 +57,30 @@ class Events(Resource):
 
 api.add_resource(Events, '/api/v1/events')
 api.add_resource(Users, '/api/v1/users')
+
+class Notifications(Resource):
+    def post(self):
+        params = request.json
+        notificationObj = Notification(
+            user_id =  params['user_id'],
+            content = params['content'],
+            type = params['type']
+        )
+        db.session.add(notificationObj)
+        db.session.commit()
+        return make_response(notificationObj.to_dict(), 201)
+
+api.add_resource(Notifications, '/api/v1/notifications')
+
+class NotificationsByUser(Resource):
+    def delete(self, id):
+        notes = Notification.query.filter_by(user_id=id)
+        for note in notes:
+            db.session.delete(note)
+        db.session.commit()
+        return make_response('', 204)
+
+api.add_resource(NotificationsByUser, '/api/v1/notificationsbyuser/<int:id>')
 
 @app.route('/api/v1/authorized')
 def authorized():
@@ -150,6 +174,18 @@ class Registrations(Resource):
         return make_response(new_registration.to_dict(),201)
     
 api.add_resource(Registrations, '/api/v1/registrations')
+
+class RegistrationsById(Resource):
+    def delete(self, id):
+        registration = Registration.query.get(id)
+        if not registration:
+            return make_response({'error': 'registration not found'}, 404)
+        db.session.delete(registration)
+        db.session.commit()
+        return make_response('',204)
+    
+api.add_resource(RegistrationsById, '/api/v1/registrations/<int:id>')
+
 
 class RegistrationsByEventIdUserId(Resource):
     def delete(self, eventId, userId):

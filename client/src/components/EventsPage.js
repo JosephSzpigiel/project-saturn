@@ -3,9 +3,12 @@ import EventCard from "./EventCard";
 import { Container, Wrap, Center, Heading,Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 
 function EventsPage(){
-    const {user, events, setEvents} = useOutletContext()
+    const {user, setUser, events, setEvents, setMyCreatedIds, setMyRegisteredIds} = useOutletContext()
 
-    const eventCards = events.map(event => <EventCard key={event.id} event={event} setEvents={setEvents} user={user}/>)
+    const sortedEvents = events.sort((a,b) => new Date(a.start_time) - new Date(b.start_time))
+    console.log(sortedEvents)
+
+    const eventCards = sortedEvents.map(event => <EventCard setMyRegisteredIds={setMyRegisteredIds} setMyCreatedIds={setMyCreatedIds} key={event.id} setUser={setUser} event={event} setEvents={setEvents} user={user}/>)
 
     return(
         <>

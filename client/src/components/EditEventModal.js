@@ -14,12 +14,20 @@ import {
     Textarea,
     ModalCloseButton,
     Input,
-    Button
+    Button,
+    Flex,
+    Spacer,
+    VStack,
+    HStack,
+    Image
 } from "@chakra-ui/react";
 import { Field, Form, Formik} from 'formik'
 import * as yup from 'yup'
+import { useState } from "react";
+import UploadWidget from "./UploadWidget";
 
-function EditEventModal({isEditOpen, onEditClose, eventInfo, setEventInfo, setDate, setTicketsLeft, ticketsSold}){
+function EditEventModal({isEditOpen, setEvents, onEditClose, eventInfo, setEventInfo, setTicketsLeft, ticketsSold}){
+    const [thumbnail, setThumbnail] = useState(eventInfo['img_url'])
     const URL = /^((https?|ftp):\/\/)?(www.)?(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i
 
     const eventSchema = yup.object().shape({
@@ -40,7 +48,7 @@ function EditEventModal({isEditOpen, onEditClose, eventInfo, setEventInfo, setDa
 
     return(
 
-    <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered>
+    <Modal scrollBehavior='inside' isOpen={isEditOpen} onClose={onEditClose} isCentered>
         <ModalOverlay />
         <ModalContent>
             <ModalHeader>Edit {eventInfo.name}</ModalHeader>
@@ -70,7 +78,13 @@ function EditEventModal({isEditOpen, onEditClose, eventInfo, setEventInfo, setDa
                             if (resp.ok){
                                 resp.json().then(event => {
                                     setEventInfo(event)
-                                    setDate(new Date(event.start_time))
+                                    setEvents(curr => curr.map(listEvent =>{
+                                        if(listEvent.id == event.id){
+                                            return(event)
+                                        }else{
+                                            return(listEvent)
+                                        }
+                                    }))
                                     const ticketList = event.registrations.map(r => r.tickets)
                                     const ticketsSold = ticketList.reduce((a,b) => a+b,0)
                                     setTicketsLeft(event.max_tickets - ticketsSold)
@@ -139,12 +153,17 @@ function EditEventModal({isEditOpen, onEditClose, eventInfo, setEventInfo, setDa
                                 <Field name='img_url'>
                                     {({ field, form }) => (
                                         <FormControl marginBottom={2} isInvalid={form.errors.img_url && form.touched.img_url}>
-                                            <FormLabel>Image Url</FormLabel>
-                                            <Input {...field}/>
-                                            <FormErrorMessage as={Alert} status={'error'}>
-                                                <AlertIcon />
-                                                {errors.img_url}
-                                            </FormErrorMessage>                                        
+                                            <Flex>
+                                                <Spacer/>
+                                                <VStack>
+                                                    <HStack>
+                                                        <FormLabel>Event Image:</FormLabel>
+                                                        <Image src={thumbnail} maxWidth={'100px'}/>
+                                                    </HStack>
+                                                    <UploadWidget setThumbnail={setThumbnail} values={form.values}/>
+                                                </VStack>
+                                                <Spacer/>
+                                            </Flex>                                        
                                         </FormControl>
                                     )}
                                 </Field>

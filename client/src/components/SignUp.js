@@ -1,13 +1,15 @@
-import { Flex, Spacer, ButtonGroup, Button, Box, Heading, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle  } from '@chakra-ui/react'
+import { Flex, Spacer, ButtonGroup, Button, Box, Text, Heading, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle, Image, HStack, VStack } from '@chakra-ui/react'
 import { Field, Form, Formik} from 'formik'
 import * as yup from 'yup'
 import { useState } from 'react'
+import UploadWidget from './UploadWidget'
 
 
 function SignUp( {setUser} ){
 
     const [signUp, setSignUp] = useState(false)
     const [loginError, setLoginError] = useState(false)
+    const [thumbnail, setThumbnail] = useState('')
 
     function toggleSignup() {
         setSignUp((currentSignup) => !currentSignup)
@@ -21,7 +23,7 @@ function SignUp( {setUser} ){
         last_name: yup.string().max(15, 'Last name must be 15 characters or less').required('Last name is required!'),
         email: yup.string().email('Invalid email').required('Email is required!'),
         password: yup.string().min(5, 'Password must be at least 5 characters').max(15, 'Password must be 15 characters or less').required('Password is required!'),
-        img_url: yup.string().matches(URL, 'Enter a valid url')
+        // img_url: yup.string().matches(URL, 'Enter a valid url')
     })
 
     return (
@@ -117,12 +119,21 @@ function SignUp( {setUser} ){
                                 {signUp && <Field name='img_url'>
                                     {({ field, form }) => (
                                         <FormControl marginBottom={2} isInvalid={form.errors.img_url && form.touched.img_url}>
-                                            <FormLabel>Image Url</FormLabel>
+                                            <Flex>
+                                                <Spacer/>
+                                                <VStack>
+                                                    <FormLabel>Profile Picture:</FormLabel>
+                                                    {thumbnail ? <Image src={thumbnail} maxWidth={'100px'}/>: null}
+                                                    <UploadWidget setThumbnail={setThumbnail} values={form.values}/>
+                                                </VStack>
+                                                <Spacer/>
+                                            </Flex>
+                                            {/* <FormLabel>Image Url</FormLabel>
                                             <Input {...field}/>
                                             <FormErrorMessage as={Alert} status={'error'}>
                                                 <AlertIcon />
                                                 {errors.img_url}
-                                            </FormErrorMessage>                                          
+                                            </FormErrorMessage>                                           */}
                                         </FormControl>
                                     )}
                                 </Field>}
