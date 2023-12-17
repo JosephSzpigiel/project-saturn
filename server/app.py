@@ -64,6 +64,7 @@ class Notifications(Resource):
         notificationObj = Notification(
             user_id =  params['user_id'],
             content = params['content'],
+            type = params['type']
         )
         db.session.add(notificationObj)
         db.session.commit()

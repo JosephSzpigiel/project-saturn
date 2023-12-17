@@ -108,6 +108,7 @@ class Notification(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key = True)
     content =db.Column(db.String)
+    type = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', back_populates = 'notifications')
     serialize_rules = ('-user',)

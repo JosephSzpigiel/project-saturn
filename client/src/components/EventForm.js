@@ -1,11 +1,14 @@
-import { Flex, Textarea, Spacer, ButtonGroup, Button, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Box, Heading, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle, Select  } from '@chakra-ui/react'
+import { Flex, Textarea, Spacer, ButtonGroup, Button, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Box, Heading, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle, Select, VStack, Image, HStack  } from '@chakra-ui/react'
 import { Field, Form, Formik} from 'formik'
 import * as yup from 'yup'
 import { useState } from 'react'
 import { useOutletContext, useNavigate, NavLink } from 'react-router-dom'
+import UploadWidget from './UploadWidget'
 
 function EventForm(){
     const [eventError, setEventError] = useState(false)
+    const [thumbnail, setThumbnail] = useState('')
+
 
     const {user, setUser, setEvents, setMyCreatedIds} = useOutletContext()
 
@@ -19,7 +22,7 @@ function EventForm(){
         description: yup.string().required('Description is required!'),
         event_type_id: yup.number().required('Event Type is required!'),
         start_time: yup.date().required('Start Time is required!'),
-        img_url: yup.string().matches(URL, 'Enter a valid url'),
+        // img_url: yup.string().matches(URL, 'Enter a valid url'),
         max_tickets: yup.number().integer().positive('Tickets Available must be a positive number').required('Tickets are required!')
     })
 
@@ -70,6 +73,8 @@ function EventForm(){
                         validateOnBlur={true}
                         validateOnChange={false}
                         onSubmit={values => {
+                            console.log(values)
+                            values.img_url = thumbnail
                             console.log(values)
                             fetch('/events', {
                                 method: 'POST',
@@ -151,18 +156,6 @@ function EventForm(){
                                         </FormControl>
                                     )}
                                 </Field>
-                                <Field name='img_url'>
-                                    {({ field, form }) => (
-                                        <FormControl marginBottom={2} isInvalid={form.errors.img_url && form.touched.img_url}>
-                                            <FormLabel>Image Url</FormLabel>
-                                            <Input {...field}/>
-                                            <FormErrorMessage as={Alert} status={'error'}>
-                                                <AlertIcon />
-                                                {errors.img_url}
-                                            </FormErrorMessage>                                        
-                                        </FormControl>
-                                    )}
-                                </Field>
                                 <Field name='max_tickets'>
                                     {({ field, form }) => (
                                         <FormControl marginBottom={2} isInvalid={form.errors.max_tickets && form.touched.max_tickets}>
@@ -175,6 +168,23 @@ function EventForm(){
                                         </FormControl>
                                     )}
                                 </Field>
+                                <Field name='img_url'>
+                                    {({ field, form }) => (
+                                        <FormControl marginBottom={2} isInvalid={form.errors.img_url && form.touched.img_url}>
+                                            <Flex>
+                                                <Spacer/>
+                                                <VStack>
+                                                    <HStack>
+                                                        <FormLabel>Event Image:</FormLabel>
+                                                        {thumbnail ? <Image src={thumbnail} maxWidth={'100px'}/>: null}
+                                                    </HStack>
+                                                    <UploadWidget setThumbnail={setThumbnail} values={form.values}/>
+                                                </VStack>
+                                                <Spacer/>
+                                            </Flex>                                    
+                                        </FormControl>
+                                    )}
+                                </Field>
                                 <Flex marginTop={4}>
                                     <Spacer/>
                                         <Button type='submit' isLoading={isSubmitting}>Submit</Button>
@@ -183,6 +193,7 @@ function EventForm(){
                                 {eventError && <Alert marginTop={4} status='error'>
                                     <AlertIcon />
                                     <AlertTitle>Issue creating Event</AlertTitle>
+                                    setSubmitting(false)
                                 </Alert>}
                             </Form> 
                         )}

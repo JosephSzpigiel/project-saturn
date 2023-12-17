@@ -27,6 +27,17 @@ function RegisteredEventsTabRow({event, setEvents, user, setUser, setMyCreated, 
                     }
                 })])})
                 setMyRegisteredIds(curr => [...curr].filter(id => id !== eventInfo.id))
+                fetch('/notifications',{
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'user_id': eventInfo.created_by.id, 
+                        'content': `${user.first_name} cancelled for ${eventInfo.name}`,
+                        'type': 'cancellation'
+                    })
+                })
             }
         })
     }

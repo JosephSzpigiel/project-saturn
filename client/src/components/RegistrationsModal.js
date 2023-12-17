@@ -32,6 +32,17 @@ function RegistrationsModal({user, setTicketsLeft, setRegistered, eventInfo, set
                 if(eventInfo.max_tickets){
                     setTicketsLeft(eventInfo.max_tickets - ticketsSold)
                 }
+                fetch('/notifications',{
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'user_id': eventInfo.created_by.id, 
+                        'content': `${user.first_name} cancelled for ${eventInfo.name}`,
+                        'type': 'cancellation'
+                    })
+                })
             }
         })
     }

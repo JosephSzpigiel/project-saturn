@@ -17,14 +17,17 @@ import {
     ListIcon
 } from "@chakra-ui/react";
 
-import {CheckCircleIcon} from "@chakra-ui/icons"
+import {CheckCircleIcon, SmallCloseIcon} from "@chakra-ui/icons"
 
 function NotificationsModal({user, setUser, notes, isOpen, onClose}){
 
     const noteList = notes.map(note => {
+        const NoteIcon = note.type === 'registration' && <ListIcon as={CheckCircleIcon} color='green.500'/> ||
+                        note.type === 'cancellation' && <ListIcon as={SmallCloseIcon} color='red.500'/>
+
         return(
             <ListItem key={note.id}>
-                <ListIcon as={CheckCircleIcon} color='green.500'/>
+                {NoteIcon}
                 {note.content}
             </ListItem>
         )

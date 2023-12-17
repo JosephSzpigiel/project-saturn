@@ -65,7 +65,8 @@ function RegisterModal({isOpen, setEvents, ticketsLeft, setEventInfo, onClose, e
                                                 },
                                                 body: JSON.stringify({
                                                     'user_id': eventInfo.created_by.id, 
-                                                    'content': `${user.first_name} registered for ${eventInfo.name}`
+                                                    'content': `${user.first_name} registered for ${eventInfo.name}`,
+                                                    'type': 'registration'
                                                 })
                                             })
                     

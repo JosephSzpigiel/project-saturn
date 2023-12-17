@@ -14,8 +14,8 @@ import RegistrationsModal from "./RegistrationsModal"
 function EventPage(){
     const {eventId} = useParams()
     const [eventInfo, setEventInfo] = useState({created_by:{first_name: '', last_name: ''}, event_type:{type_name: ''}, registrations:[]})
-    const [date, setDate] = useState('')
     const {user, setUser, setEvents, myRegisteredIds, setMyRegisteredIds} = useOutletContext()
+    const [loaded, setLoaded] = useState(false)
     const [registered, setRegistered] = useState(false)
     const [ticketsLeft, setTicketsLeft] = useState(100000000000)
     const [ticketsSold, setTicketsSold] = useState(0)
@@ -31,7 +31,6 @@ function EventPage(){
                 resp.json()
                 .then((event) => {
                     setEventInfo(event)
-                    setDate(new Date(event.start_time))
                     console.log(myRegisteredIds)
                     if( myRegisteredIds.filter(id => id === event.id).length !== 0){
                         setRegistered(true)
@@ -41,6 +40,7 @@ function EventPage(){
                     if(event.max_tickets){
                         setTicketsLeft(event.max_tickets - ticketsSoldInit)
                     }
+                    setLoaded(true)
                 })
                 }
             else {
@@ -62,6 +62,17 @@ function EventPage(){
                 if(eventInfo.max_tickets){
                     setTicketsLeft(eventInfo.max_tickets - ticketsSold)
                 }
+                fetch('/notifications',{
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'user_id': eventInfo.created_by.id, 
+                        'content': `${user.first_name} cancelled for ${eventInfo.name}`,
+                        'type': 'cancellation'
+                    })
+                })
             }
         })
     }
@@ -86,6 +97,25 @@ function EventPage(){
             Sold Out
         </Button>)
 
+    let dateString = ``
+    let timeString = ``
+    if(loaded){
+        const date = new Date(eventInfo.start_time).toString().split(' ')
+        const weekday = date[0]
+        const month = date[1]
+        const day = date[2]
+        const year = date[3]
+        const time = date[4].split(':')
+        const hour = time[0]
+        const amPmHour = hour > 12 ? hour - 12 : hour
+        const amPmHourNonZero = amPmHour === '00' ? 12 : amPmHour
+        const amPm = hour > 12 ? 'PM' : 'AM'
+        const minutes = time[1]
+        dateString = `Date: ${weekday} ${month} ${day}, ${year}`
+        timeString = `Time: ${amPmHourNonZero}:${minutes} ${amPm}`
+    }
+
+
 
     return (
         <>
@@ -108,17 +138,20 @@ function EventPage(){
         </Breadcrumb>
 
         <Center>
-        <Card width = '70%'>
+        <Card width = '90%' maxWidth={'600px'}>
             <Skeleton fitContent={false} isLoaded>
             <Heading m={3} size='lg' align='center'>{eventInfo.name}</Heading>
             <Divider/>
-            <Heading m={3} size='sm' align='center'>{date.toString().split(' ').slice(0,5).join(' ').split(':').slice(0,2).join(':')}</Heading>
+            <Heading m={3} size='sm' align='center'>{dateString}</Heading>
+            <Heading m={3} size='sm' align='center'>{timeString}</Heading>
+
             <CardBody>
                 <Center>
                     <Center width='80%'>
                         <Image
                         src={eventInfo.img_url}
                         alt={eventInfo.name}
+                        maxHeight={'30vh'}
                         borderRadius='lg'
                         fallbackSrc='https://via.placeholder.com/300'
                         />
@@ -168,7 +201,7 @@ function EventPage(){
         </Card>
         </Center>
 
-        <EditEventModal ticketsSold={ticketsSold} isEditOpen={isEditOpen} onEditClose={onEditClose} eventInfo={eventInfo} setDate={setDate} setTicketsLeft={setTicketsLeft} setEventInfo={setEventInfo}/>
+        <EditEventModal setEvents={setEvents} ticketsSold={ticketsSold} isEditOpen={isEditOpen} onEditClose={onEditClose} eventInfo={eventInfo} setTicketsLeft={setTicketsLeft} setEventInfo={setEventInfo}/>
         <RegisterModal setEvents={setEvents} setMyRegisteredIds={setMyRegisteredIds} ticketsLeft={ticketsLeft} setEventInfo={setEventInfo} isOpen={isOpen} onClose={onClose} eventInfo={eventInfo} user={user} setRegistered={setRegistered} setTicketsLeft={setTicketsLeft}/>
         <RegistrationsModal user={user} setMyRegisteredIds={setMyRegisteredIds} setTicketsLeft={setTicketsLeft} setRegistered={setRegistered}eventInfo={eventInfo} setEventInfo={setEventInfo} isRegistrationsOpen={isRegistrationsOpen} onRegistrationsClose={onRegistrationsClose}/>
         </>

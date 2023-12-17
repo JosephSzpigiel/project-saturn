@@ -3,6 +3,8 @@ import { ChakraProvider, Container, Flex } from '@chakra-ui/react'
 import {Outlet} from 'react-router-dom';
 import Header from "./Header";
 import SignUp from "./SignUp";
+import {Cloudinary} from "@cloudinary/url-gen";
+
 
 
 
@@ -15,7 +17,9 @@ function App() {
   const [myCreatedIds, setMyCreatedIds]  = useState([])
 
   const [loaded, setLoaded] = useState(false)
-  const context = {user, setUser, events, setEvents, myRegisteredIds, setMyRegisteredIds, myCreatedIds, setMyCreatedIds}
+  const cld = new Cloudinary({cloud: {cloudName: 'dtzlah962'}});
+  const context = {user, setUser, events, setEvents, myRegisteredIds, setMyRegisteredIds, myCreatedIds, setMyCreatedIds, cld}
+
 
   useEffect(() => {
     fetch('/authorized')
@@ -37,7 +41,9 @@ function App() {
       fetch('/events')
       .then((resp)=>{
         if (resp.ok) {
-          resp.json().then((events)=> setEvents(events))
+          resp.json().then((events)=> {
+            setEvents(events)
+          })
           setLoaded(true)
         }
       })
