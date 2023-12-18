@@ -5,7 +5,7 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
-    useDisclosure, Image, Heading, Divider, Center, Badge, Text, Card, CardBody, CardFooter, CardHeader, Stack, Button, ButtonGroup, Skeleton} from "@chakra-ui/react";
+    useDisclosure, Image, Heading, Divider, Center, Badge, Text, Card, CardBody, CardFooter, CardHeader, Stack, Button, ButtonGroup, Skeleton, Alert, AlertIcon} from "@chakra-ui/react";
 import { useOutletContext, NavLink } from "react-router-dom";
 import EditEventModal from "./EditEventModal";
 import RegisterModal from "./RegisterModal";
@@ -24,6 +24,7 @@ function EventPage(){
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isEditOpen , onOpen: onEditOpen, onClose: onEditClose } = useDisclosure()
     const { isOpen: isRegistrationsOpen , onOpen: onRegistrationsOpen, onClose: onRegistrationsClose } = useDisclosure()
+    const today = new Date()
 
 
     useEffect(() => {
@@ -99,10 +100,23 @@ function EventPage(){
             Sold Out
         </Button>)
 
+    const registerButtonOptions = (
+        !registered ? 
+        registerButton:
+        <>
+        <Button onClick={handleCancel} variant='solid' colorScheme='blue'>
+            Cancel Registration
+        </Button> 
+        </>
+    )
+
     let dateString = ``
     let timeString = ``
+    let dateObj = null
+
     if(loaded){
-        const date = new Date(eventInfo.start_time).toString().split(' ')
+        dateObj = new Date(eventInfo.start_time)
+        const date = dateObj.toString().split(' ')
         const weekday = date[0]
         const month = date[1]
         const day = date[2]
@@ -179,13 +193,13 @@ function EventPage(){
             <Divider />
             <CardFooter justify='center'>
                 <Wrap spacing='2' justify='center'>
-                    {
-                        !registered ? 
-                        registerButton:
-                        <Button onClick={handleCancel} variant='solid' colorScheme='blue'>
-                            Cancel Registration
-                        </Button> 
+                    {registered ? 
+                        <Alert status='success'marginBottom={'5px'}>
+                            <AlertIcon/>
+                            You are registered for {eventInfo.name}!
+                        </Alert>: null
                     }
+                    {dateObj > today ? registerButtonOptions : <Button isDisabled={true}>Event Passed</Button>}
 
                 {user.id === eventInfo.created_by_id ?
                     <ButtonGroup spacing='2'>
