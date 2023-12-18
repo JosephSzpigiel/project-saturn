@@ -10,6 +10,8 @@ import { useOutletContext, NavLink } from "react-router-dom";
 import EditEventModal from "./EditEventModal";
 import RegisterModal from "./RegisterModal";
 import RegistrationsModal from "./RegistrationsModal"
+import square from '../images/blue_square.jpeg'
+
 
 function EventPage(){
     const {eventId} = useParams()
@@ -148,13 +150,13 @@ function EventPage(){
             <CardBody>
                 <Center>
                     <Center width='80%'>
-                        <Image
-                        src={eventInfo.img_url}
-                        alt={eventInfo.name}
-                        maxHeight={'30vh'}
-                        borderRadius='lg'
-                        fallbackSrc='https://via.placeholder.com/300'
-                        />
+                            <Image
+                            src={eventInfo.img_url}
+                            alt={eventInfo.name}
+                            maxHeight={'30vh'}
+                            borderRadius='lg'
+                            fallbackSrc={square}
+                            />
                     </Center>
                 </Center>
 

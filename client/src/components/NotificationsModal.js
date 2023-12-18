@@ -7,14 +7,11 @@ import {
     ModalBody,
     ModalCloseButton,
     Button,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper,
     List,
     ListItem,
-    ListIcon
+    ListIcon,
+    Alert,
+    AlertIcon
 } from "@chakra-ui/react";
 
 import {CheckCircleIcon, SmallCloseIcon} from "@chakra-ui/icons"
@@ -22,13 +19,15 @@ import {CheckCircleIcon, SmallCloseIcon} from "@chakra-ui/icons"
 function NotificationsModal({user, setUser, notes, isOpen, onClose}){
 
     const noteList = notes.map(note => {
-        const NoteIcon = note.type === 'registration' && <ListIcon as={CheckCircleIcon} color='green.500'/> ||
-                        note.type === 'cancellation' && <ListIcon as={SmallCloseIcon} color='red.500'/>
+        const NoteStatus = note.type === 'registration' && 'success' ||
+                        note.type === 'cancellation' && 'error'
 
         return(
             <ListItem key={note.id}>
-                {NoteIcon}
-                {note.content}
+                <Alert status={NoteStatus}>
+                    <AlertIcon/>
+                    {note.content}
+                </Alert>
             </ListItem>
         )
     })
@@ -45,7 +44,7 @@ function NotificationsModal({user, setUser, notes, isOpen, onClose}){
     }
 
     return(
-        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <Modal scrollBehavior='inside' isOpen={isOpen} onClose={onClose} isCentered>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Notifications</ModalHeader>
