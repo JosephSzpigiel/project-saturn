@@ -33,13 +33,15 @@ function EventCard({event, user, setUser, setEvents, setMyCreatedIds, setMyRegis
     }
 
     return(
-        <Card width={'20%'} minW={'250px'}>
+        <Card width={'20%'} minW={'300px'}>
             <CardBody>
                 <Image
                     src={event['img_url']}
                     alt={event['name']}
                     borderRadius='lg'
                     fallbackSrc='https://via.placeholder.com/300'
+                    boxSize='250px'
+                    objectFit='cover'
                 />
                 <Stack mt='6' spacing='3'>
                     <Heading size='md'>{event['name']}</Heading>

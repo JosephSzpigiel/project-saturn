@@ -1,15 +1,13 @@
-import { useDisclosure, Tr, Td, Button } from "@chakra-ui/react"
+import { Tr, Td, Button } from "@chakra-ui/react"
 import { useState } from "react";
-import EditEventModal from "./EditEventModal";
-import RegistrationsModal from "./RegistrationsModal";
 import { useNavigate } from "react-router-dom";
 
 function RegisteredEventsTabRow({event, setEvents, user, setUser, setMyCreated, setMyRegisteredIds}){
 
-    const [date, setDate] = useState(new Date(event.start_time))
     const [eventInfo, setEventInfo] = useState(event)
     const nav = useNavigate()
 
+    const date = new Date(event.start_time)
 
     function handleCancel(){
         fetch(`/registrations/${eventInfo.id}/${user.id}`, {
@@ -18,7 +16,7 @@ function RegisteredEventsTabRow({event, setEvents, user, setUser, setMyCreated, 
             if (resp.ok) {
                 setEventInfo(curr => {return({...curr, 'registrations': curr['registrations'].filter(r => r.user_id !== user.id) })})
                 setEvents(curr => {return([...curr.map(listEvent => {
-                    if(listEvent.id == eventInfo.id){
+                    if(listEvent.id === eventInfo.id){
                         return (
                             {...listEvent, 'registrations': listEvent['registrations'].filter(r => user.id !== r.user_id)}
                         )
@@ -42,7 +40,7 @@ function RegisteredEventsTabRow({event, setEvents, user, setUser, setMyCreated, 
         })
     }
 
-    const registration = eventInfo.registrations.filter(r => r.user_id == user.id)[0]
+    const registration = eventInfo.registrations.filter(r => r.user_id === user.id)[0]
     
     return(
             <Tr>
