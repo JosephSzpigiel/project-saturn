@@ -117,7 +117,7 @@ function EventPage(){
         timeString = `Time: ${amPmHourNonZero}:${minutes} ${amPm}`
     }
 
-
+    const fallbackOption = eventInfo['img_url'] ? <Skeleton height={'250px'} width={'250px'}/> : null
 
     return (
         <>
@@ -141,7 +141,6 @@ function EventPage(){
 
         <Center>
         <Card width = '90%' maxWidth={'600px'}>
-            <Skeleton fitContent={false} isLoaded>
             <Heading m={3} size='lg' align='center'>{eventInfo.name}</Heading>
             <Divider/>
             <Heading m={3} size='sm' align='center'>{dateString}</Heading>
@@ -151,11 +150,11 @@ function EventPage(){
                 <Center>
                     <Center width='80%'>
                             <Image
-                            src={eventInfo.img_url}
-                            alt={eventInfo.name}
-                            maxHeight={'30vh'}
-                            borderRadius='lg'
-                            fallbackSrc={square}
+                                src={eventInfo.img_url}
+                                alt={eventInfo.name}
+                                maxHeight={'30vh'}
+                                borderRadius='lg'
+                                fallback={fallbackOption}
                             />
                     </Center>
                 </Center>
@@ -199,7 +198,6 @@ function EventPage(){
                     </ButtonGroup>: null}
                 </Wrap>                  
             </CardFooter>
-        </Skeleton>
         </Card>
         </Center>
 

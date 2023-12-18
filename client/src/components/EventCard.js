@@ -36,6 +36,9 @@ function EventCard({event, user, setUser,  setEvents, setMyCreatedIds, setMyRegi
         })
     }
 
+    const fallbackOption = event['img_url'] ? <Skeleton height={'250px'} width={'250px'}/> : null
+    const fallbackSrcOption = !event['img_url'] ? square : null
+
     return(
         <Card width={'20%'} minW={'300px'}>
             <CardBody>
@@ -44,7 +47,9 @@ function EventCard({event, user, setUser,  setEvents, setMyCreatedIds, setMyRegi
                         src={event['img_url']}
                         alt={event['name']}
                         borderRadius='lg'
-                        fallbackSrc={square}
+                        // fallbackSrc={square}
+                        fallbackSrc={fallbackSrcOption}
+                        fallback={fallbackOption}
                         boxSize='250px'
                         objectFit='cover'
                         onLoad={() => loaded = true}
