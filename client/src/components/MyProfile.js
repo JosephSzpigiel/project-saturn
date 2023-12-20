@@ -3,9 +3,10 @@ import { Grid, GridItem, Heading, Center, Tabs, TabPanels, Tab, TabList, TabPane
 import ProfileTab from "./ProfileTab"
 import CreatedEventsTab from "./CreatedEventsTab"
 import RegisteredEventsTab from "./RegisteredEventsTab"
+import GroupsTab from "./GroupsTab"
 
 function MyProfile(){
-    const {user, setUser, events, setEvents, myCreatedIds, setMyCreatedIds, myRegisteredIds, setMyRegisteredIds} = useOutletContext()
+    const {user, setUser, events, setEvents, myCreatedIds, setMyCreatedIds, myRegisteredIds, setMyRegisteredIds, myGroups, setGroups, setMyGroups, groups} = useOutletContext()
 
     return(
         <>
@@ -45,6 +46,7 @@ function MyProfile(){
                         <Tab>Profile Information</Tab>
                         <Tab>Created Events</Tab>
                         <Tab>Registered Events</Tab>
+                        <Tab>Groups</Tab>
                     </TabList>
                     <TabPanels>
                         <TabPanel>
@@ -55,6 +57,9 @@ function MyProfile(){
                         </TabPanel>
                         <TabPanel>
                             <RegisteredEventsTab events={events} user={user} setUser={setUser} setEvents={setEvents} myCreatedIds={myCreatedIds} setMyCreatedIds={setMyCreatedIds} myRegisteredIds={myRegisteredIds} setMyRegisteredIds={setMyRegisteredIds}/>
+                        </TabPanel>
+                        <TabPanel>
+                            <GroupsTab groups={groups} setGroups={setGroups} myGroups={myGroups} setMyGroups={setMyGroups}/>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

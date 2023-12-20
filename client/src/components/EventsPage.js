@@ -1,6 +1,6 @@
-import { useOutletContext, NavLink } from "react-router-dom";
+import { useOutletContext, NavLink, useNavigate } from "react-router-dom";
 import EventCard from "./EventCard";
-import { Checkbox, Wrap, useDisclosure, Center, Popover, PopoverBody, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, Button, Heading,Breadcrumb, BreadcrumbItem, BreadcrumbLink, Flex, Input, InputGroup, InputLeftElement, Spacer, PopoverHeader } from "@chakra-ui/react";
+import { Checkbox, Wrap, useDisclosure, Center, Popover, PopoverBody, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, Button, Heading,Breadcrumb, BreadcrumbItem, BreadcrumbLink, Flex, Input, InputGroup, InputLeftElement, Spacer, PopoverHeader, HStack } from "@chakra-ui/react";
 import { useState } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
 
@@ -11,6 +11,7 @@ function EventsPage(){
     const [search, setSearch] = useState('')
     const { isOpen, onOpen, onClose } = useDisclosure()
 
+    const nav = useNavigate()
 
     const sortedEvents = events.sort((a,b) => new Date(a.start_time) - new Date(b.start_time)).filter((event) => event.name.toLowerCase().includes(search.toLowerCase()))
     console.log(sortedEvents)
@@ -37,16 +38,20 @@ function EventsPage(){
 
     return(
         <>
-            <Breadcrumb m='10px' fontWeight='medium' fontSize='lg'>
-                <BreadcrumbItem>
-                    <BreadcrumbLink as={NavLink} to='/'>
-                    Home
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbItem isCurrentPage>
-                    <BreadcrumbLink>Events</BreadcrumbLink>
-                </BreadcrumbItem>
-            </Breadcrumb>
+            <HStack>
+                <Breadcrumb m='10px' fontWeight='medium' fontSize='lg'>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink as={NavLink} to='/'>
+                        Home
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbItem isCurrentPage>
+                        <BreadcrumbLink>Events</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </Breadcrumb>
+                <Spacer/>
+                <Button onClick={()=>nav('/events/new')}>Create Event</Button>
+            </HStack>
             <Heading width='100%' textAlign='center' m='5px'>Events</Heading>
             <Center width='100%' marginBottom={'10px'}>
                 <InputGroup width='60%' marginRight={'10px'}>
@@ -75,7 +80,7 @@ function EventsPage(){
                 </Popover>
             </Center>
             <Center width='100%'>
-                <Wrap justify='center'>
+                <Wrap justify='center' paddingTop={'10px'}>
                     {eventCards}
                 </Wrap>
             </Center>

@@ -22,6 +22,7 @@ function ProfileTab({user, setUser}){
     return(
         <Box width='1fr'>
             <Flex>
+                <Spacer/>
                 <Flex direction='column'>
                     <Formik
                         initialValues={{

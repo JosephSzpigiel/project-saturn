@@ -9,6 +9,8 @@ import EventForm from "./components/EventForm";
 import EventPage from "./components/EventPage";
 import MyProfile from "./components/MyProfile";
 import EventsPage from "./components/EventsPage";
+import GroupsPage from "./components/GroupsPage";
+import GroupForm from "./components/GroupForm";
 
 const routes = [
     {
@@ -18,7 +20,7 @@ const routes = [
         children: [
             {index: true, element: <HomePage/>},
             {
-                path: '/addevent',
+                path: '/events/new',
                 element: <EventForm />,
             },
             {
@@ -32,6 +34,14 @@ const routes = [
             {
                 path: '/events',
                 element: <EventsPage />
+            },
+            {
+                path: '/groups',
+                element: <GroupsPage />
+            },
+            {
+                path: '/groups/new',
+                element: <GroupForm />
             }
         ],
     },

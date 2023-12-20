@@ -10,7 +10,7 @@ import datetime
 # Local imports
 from config import app, db, api
 # Add your model imports
-from models import User, Notification, UserType, Event, EventType, Registration
+from models import User, Notification, UserType, Event, EventType, Registration, Group, UserGroup
 
 
 # Views go here!
@@ -200,6 +200,58 @@ class RegistrationsByEventIdUserId(Resource):
 
 api.add_resource(RegistrationsByEventIdUserId, '/api/v1/registrations/<int:eventId>/<int:userId>')
 
+class Groups(Resource):
+    def post(self):
+        params = request.json
+        new_group = Group(
+            name = params['name'],
+            img_url = params['img_url'],
+            description = params['description']
+        )
+        db.session.add(new_group)
+        db.session.commit()
+        return make_response(new_group.to_dict(),201)
+    
+    def get(self):
+        return make_response([group.to_dict() for group in  Group.query.all()], 200)
+
+api.add_resource(Groups, '/api/v1/groups')
+
+class GroupsById(Resource):
+    def delete(self, id):
+        group= Group.query.get(id)
+        if not group:
+            return make_response({'error': 'group not found'}, 404)
+        db.session.delete(group)
+        db.session.commit()
+        return make_response('',204)
+    
+api.add_resource(GroupsById, '/api/v1/groups/<int:id>')
+
+class UserGroups(Resource):
+    def post(self):
+        params = request.json
+        new_user_group = UserGroup(
+            user_id = params['user_id'],
+            group_id = params['group_id'],
+            admin = params['admin']
+        )
+        db.session.add(new_user_group)
+        db.session.commit()
+        return make_response(new_user_group.to_dict(),201)
+    
+api.add_resource(UserGroups, '/api/v1/usergroups')
+
+class UserGroupsById(Resource):
+    def delete(self, id):
+        user_group= UserGroup.query.get(id)
+        if not user_group:
+            return make_response({'error': 'user_group not found'}, 404)
+        db.session.delete(user_group)
+        db.session.commit()
+        return make_response('',204)
+    
+api.add_resource(UserGroupsById, '/api/v1/usergroups/<int:id>')
 
 @app.route('/api/v1/login', methods=['POST'])
 def login():

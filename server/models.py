@@ -21,13 +21,16 @@ class User(db.Model, SerializerMixin):
     events_registered = association_proxy('registrations', 'event')
     user_type = db.relationship('UserType', back_populates='users')
     notifications = db.relationship('Notification', back_populates = 'user', cascade = 'all, delete-orphan')
+    user_groups = db.relationship('UserGroup', back_populates = 'user', cascade = 'all, delete-orphan')
+    groups = association_proxy('user_groups', 'group')
     serialize_rules = ('-events_registered.users',
                         '-events_registered.created_by',
                         '-events_created.created_by',
                         '-events_created.users',
                         '-user_type.users',
                         '-registrations.user',
-                        '-_password_hash')
+                        '-_password_hash',
+                        '-groups')
 
 
     @property
@@ -66,6 +69,8 @@ class Event(db.Model, SerializerMixin):
     users = association_proxy('regstrations', 'user')
     created_by = db.relationship('User', back_populates ='events_created')
     event_type = db.relationship('EventType', back_populates='events')
+    group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
+    group = db.relationship('Group', back_populates = 'events')
     serialize_rules = ('-users',
                         '-created_by.events_registered', '-created_by.events_created',
                         '-registrations.event', '-event_type.events')
@@ -112,3 +117,27 @@ class Notification(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', back_populates = 'notifications')
     serialize_rules = ('-user',)
+
+class Group(db.Model, SerializerMixin):
+    __tablename__ = 'groups'
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String)
+    img_url = db.Column(db.String)
+    description = db.Column(db.String)
+    events = db.relationship('Event', back_populates = 'group', cascade = 'all, delete-orphan')
+    user_groups = db.relationship('UserGroup', back_populates = 'group', cascade= 'all, delete-orphan')
+    users = association_proxy('user_groups' , 'user')
+    serialize_rules = ('-events', '-users.groups', '-users.user_groups', '-user_groups.group', '-user_groups.user')
+
+class UserGroup(db.Model, SerializerMixin):
+    __tablename__ = 'user_groups'
+
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    admin = db.Column(db.Boolean,  default=0)
+    group_id = db.Column(db.Integer,  db.ForeignKey('groups.id'))
+    group = db.relationship('Group', back_populates = 'user_groups')
+    user = db.relationship('User', back_populates = 'user_groups')
+    serialize_rules = ('-group', '-user')
+
+

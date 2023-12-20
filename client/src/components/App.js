@@ -15,10 +15,12 @@ function App() {
   const [events, setEvents] = useState([])
   const [myRegisteredIds, setMyRegisteredIds]  = useState([])
   const [myCreatedIds, setMyCreatedIds]  = useState([])
+  const [myGroups, setMyGroups] = useState([])
+  const [groups, setGroups]  = useState([])
 
   const [loaded, setLoaded] = useState(false)
   const cld = new Cloudinary({cloud: {cloudName: 'dtzlah962'}});
-  const context = {user, setUser, events, setEvents, myRegisteredIds, setMyRegisteredIds, myCreatedIds, setMyCreatedIds, cld}
+  const context = {user, myGroups, setGroups, setMyGroups, groups, setUser, events, setEvents, myRegisteredIds, setMyRegisteredIds, myCreatedIds, setMyCreatedIds, cld}
 
 
   useEffect(() => {
@@ -31,6 +33,7 @@ function App() {
             console.log(userObj['events_created'])
             setMyCreatedIds(userObj['events_created'].map(e => e.id))
             setMyRegisteredIds(userObj['registrations'].map(r => r.event_id))
+            setMyGroups(userObj['user_groups'])
           }
           )
       } else {
@@ -43,6 +46,15 @@ function App() {
         if (resp.ok) {
           resp.json().then((events)=> {
             setEvents(events)
+          })
+        }
+      })
+    }).then(()=>{
+      fetch('/groups')
+      .then((resp)=>{
+        if (resp.ok) {
+          resp.json().then((groups)=> {
+            setGroups(groups)
           })
           setLoaded(true)
         }
@@ -61,6 +73,7 @@ function App() {
       </ChakraProvider>
       )
     }
+    console.log(myGroups)
     return(
         <ChakraProvider>
           <Header user={user} setUser= {setUser}/>
