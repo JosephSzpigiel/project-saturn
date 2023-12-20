@@ -62,25 +62,25 @@ function HomePage(){
         <>
             <Grid
                 h='90vh'
-                templateRows='repeat(2, 1fr)'
+                templateRows='repeat(1, 1fr)'
                 templateColumns='repeat(2, 1fr)'
                 gap={2}
 
                 >
-                <GridItem bg = 'blue.300' rowSpan={1} colSpan={2}padding={'5px'} height={'15vh'}>
+                {/* <GridItem rowSpan={1} colSpan={2}padding={'5px'} height={'15vh'}>
                     <VStack height='100%'>
                         <Spacer/>
-                            <Heading size={'2xl'}>Registr</Heading>
-                        <Spacer/>
+                            <Heading size={'2xl'}>Welcome to Registr</Heading>
+                        <Spacer/> */}
                         {/* <UnorderedList flexWrap={true}>
                             <ListItem><b>Join a group to find events</b></ListItem>
                             <ListItem><b>Register for any events you want to attend</b></ListItem>
                             <ListItem><b>Can't find something for you? Create your own group and events to share with the world!</b></ListItem>
                         </UnorderedList> */}
                         {/* <Spacer/> */}
-                    </VStack>
-                </GridItem>
-                <GridItem colSpan={1} bg='skyblue' height='74vh' marginBottom={'10px'}>
+                    {/* </VStack>
+                </GridItem> */}
+                <GridItem colSpan={1} bg='skyblue' height='90vh' marginBottom={'10px'}>
                     <VStack height='100%' paddingTop={'40px'} paddingBottom={'10px'} paddingLeft={'10px'} paddingRight={'10px'}>
                         <Heading>Upcoming Events:</Heading>
                             <Box overflowY="auto" maxHeight="80%">
@@ -91,7 +91,7 @@ function HomePage(){
                     </VStack>
 
                 </GridItem>
-                <GridItem colSpan={1} bg='skyblue' height='74vh' marginBottom={'10px'}>
+                <GridItem colSpan={1} bg='skyblue' height='90vh' marginBottom={'10px'}>
                     <VStack height='100%' paddingTop={'40px'} paddingBottom={'10px'} paddingLeft={'10px'} paddingRight={'10px'}>
                             <Heading>Notifications:</Heading>
                             { noteList.length === 0 ? <Text as='b' fontSize={'20px'}>No Notifications</Text>:

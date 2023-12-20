@@ -31,8 +31,8 @@ function Header({user, setUser, notes, setNotes}) {
                 {user ? 
                 <HStack>
                     <ButtonGroup gap='2' m='11px'>
-                        <Button onClick={()=>nav('/groups')}>Groups</Button>
-                        <Button onClick={()=>nav('/events')}>Events</Button>
+                        <Button variant='solid' onClick={()=>nav('/groups')}>Groups</Button>
+                        <Button variant='solid' onClick={()=>nav('/events')}>Events</Button>
                     </ButtonGroup>
                     <Menu id='profile_menu'>
                         <MenuButton>

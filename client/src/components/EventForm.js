@@ -29,7 +29,7 @@ function EventForm(){
     })
 
     const eventSchema = yup.object().shape({
-        name: yup.string().max(15, 'Event name must be 15 characters or less').required('Event name is required!'),
+        name: yup.string().max(30, 'Event name must be 30 characters or less').required('Event name is required!'),
         description: yup.string().required('Description is required!'),
         event_type_id: yup.number().required('Event Type is required!'),
         start_time: yup.date().required('Start Time is required!'),

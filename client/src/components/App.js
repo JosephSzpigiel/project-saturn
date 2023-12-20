@@ -73,7 +73,7 @@ function App() {
       return(
         <ChakraProvider>
           <Header user={user} setUser={setUser} notes={notes} setNotes={setNotes} />
-          <div style={{'marginTop':'70px', 'marginLeft':'10px', 'marginRight':'10px', 'width':'1fr'}}>
+          <div style={{'transparency':'1', 'marginTop':'70px', 'marginLeft':'10px', 'marginRight':'10px', 'width':'1fr'}}>
             <SignUp setNotes={setNotes} setUser={setUser} setMyGroups={setMyGroups} setMyCreatedIds={setMyCreatedIds} setMyRegisteredIds={setMyRegisteredIds}/>          
           </div>
       </ChakraProvider>
@@ -84,7 +84,7 @@ function App() {
         <ChakraProvider>
           <Header user={user} setUser= {setUser} notes={notes} setNotes={setNotes}/>
           <Box  marginTop='70px' paddingLeft='10px' paddingRight='10px' width='1fr'>
-            <Outlet context={context}/>
+            <Outlet marginTop='70px' paddingLeft='10px' paddingRight='10px' width='1fr' context={context}/>
           </Box>
         </ChakraProvider>
       )

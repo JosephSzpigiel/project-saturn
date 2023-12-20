@@ -46,6 +46,7 @@ function SignUp( {setUser, setMyGroups, setMyCreatedIds, setMyRegisteredIds, set
                         validateOnChange={false}
                         onSubmit={(values, actions) => {
                             const endpoint = signUp ? '/users' : '/login'
+                            values.img_url = thumbnail
                             fetch(endpoint, {
                                 method: 'POST',
                                 headers: {

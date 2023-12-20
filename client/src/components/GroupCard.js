@@ -80,7 +80,7 @@ function GroupCard({user, group, myGroups, setMyGroups, setGroups, setEvents, ev
                 direction={{ base: 'column', sm: 'row' }}
                 overflow='hidden'
                 variant='outline'
-                width={'55vw'}
+                width={'700px'}
             >
                 <Image
                     objectFit='cover'
@@ -91,16 +91,16 @@ function GroupCard({user, group, myGroups, setMyGroups, setGroups, setEvents, ev
                 />
 
                 <Stack>
-                    <CardBody>
+                    <CardBody width={'500px'}>
                     <Heading size='md'>{group.name}</Heading>
 
-                    <Text py='2'>
-                        {group.description}
-                    </Text>
-                    <VStack align={'left'}>
-                        <Badge bg={'lightblue'}>Number of Events: {eventCount}</Badge>
-                        <Badge bg={'blue.200'}>Number of Members: {memberCount}</Badge>
-                    </VStack>
+                        <Text py='2' width={'100%'}>
+                            {group.description}
+                        </Text>
+                        <VStack align={'left'} width={'100%'}>
+                            <Badge textAlign={'center'} bg={'lightblue'}>Number of Events: {eventCount}</Badge>
+                            <Badge textAlign={'center'} bg={'blue.200'}>Number of Members: {memberCount}</Badge>
+                        </VStack>
                     </CardBody>
 
                     <CardFooter>
