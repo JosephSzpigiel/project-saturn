@@ -5,7 +5,7 @@ import { useState } from 'react'
 import UploadWidget from './UploadWidget'
 
 
-function SignUp( {setUser, setMyGroups, setMyCreatedIds, setMyRegisteredIds} ){
+function SignUp( {setUser, setMyGroups, setMyCreatedIds, setMyRegisteredIds, setNotes} ){
 
     const [signUp, setSignUp] = useState(false)
     const [loginError, setLoginError] = useState(false)
@@ -29,7 +29,7 @@ function SignUp( {setUser, setMyGroups, setMyCreatedIds, setMyRegisteredIds} ){
     return (
         <Flex>
             <Spacer/>
-                <Flex direction='column'>
+                <Flex direction='column' backgroud>
                     <Heading m={3} size='lg' align='center'>{signUp ? 'Sign Up' : 'Log In'}</Heading>
                     <Button minWidth={360} size='sm' onClick={toggleSignup}>{signUp ? `Have an account? Login instead!` : 'Register for an account'}</Button>
                     <Formik
@@ -60,6 +60,7 @@ function SignUp( {setUser, setMyGroups, setMyCreatedIds, setMyRegisteredIds} ){
                                         setMyGroups(user['user_groups'])
                                         setMyCreatedIds(user['events_created'].map(e => e.id))
                                         setMyRegisteredIds(user['registrations'].map(r => r.event_id))
+                                        setNotes(user['notifications'])
                                         // navigate into site
                                     })
                                 } else { 

@@ -11,8 +11,6 @@ import {
     Button,
     useDisclosure
 } from '@chakra-ui/react'
-import CreatedEventsTabRow from './CreatedEventsTabRow'
-import RegisteredEventsTabRow from './RegisteredEventsTabRow'
 
 
 function GroupsTab({groups, myGroups}){
@@ -36,7 +34,7 @@ function GroupsTab({groups, myGroups}){
                 <Tr>
                     <Th>Group Name</Th>
                     <Th>Group Id</Th>
-                    <Th>Description</Th>
+                    <Th></Th>
                 </Tr>
             </Thead>
             <Tbody>

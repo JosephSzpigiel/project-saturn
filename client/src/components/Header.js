@@ -1,10 +1,10 @@
 import { Flex,Popover, useDisclosure, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody, PopoverHeader, Spacer, ButtonGroup, Button, Box, Heading, Avatar,  AvatarBadge, Menu, MenuButton, MenuItem, MenuList, HStack, MenuDivider } from '@chakra-ui/react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
 import NotificationsModal from './NotificationsModal'
 
-function Header({user, setUser}) {
+function Header({user, setUser, notes, setNotes}) {
     const { onOpen, onClose, isOpen } = useDisclosure()
     const nav = useNavigate()
 
@@ -20,13 +20,6 @@ function Header({user, setUser}) {
         })
     }
 
-    const [notes, setNotes] = useState([])
-
-    useEffect(()=> {
-        if(user){
-            setNotes(user.notifications)
-        }
-    },[user])
     
     return(
         <Flex as="header" zIndex={100} position="fixed" w="100%" top={0} alignItems='center' gap='2' bg='blue' height='60px'>
@@ -57,7 +50,7 @@ function Header({user, setUser}) {
                 :
                 null}
             </div>
-            <NotificationsModal user={user} setUser={setUser} notes={notes} onClose={onClose} isOpen={isOpen}/>
+            <NotificationsModal user={user} setNotes={setNotes} setUser={setUser} notes={notes} onClose={onClose} isOpen={isOpen}/>
         </Flex>
     )
 }

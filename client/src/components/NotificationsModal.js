@@ -16,7 +16,7 @@ import {
 
 import {CheckCircleIcon, SmallCloseIcon} from "@chakra-ui/icons"
 
-function NotificationsModal({user, setUser, notes, isOpen, onClose}){
+function NotificationsModal({user, setUser, notes, setNotes, isOpen, onClose}){
 
     const noteList = notes.map(note => {
         const NoteStatus = note.type === 'registration' && 'success' ||
@@ -38,6 +38,7 @@ function NotificationsModal({user, setUser, notes, isOpen, onClose}){
         }).then(resp => {
             if(resp.ok){
                 setUser(curr => {return({...curr, 'notifications':[]})})
+                setNotes([])
                 onClose()
             }
         })

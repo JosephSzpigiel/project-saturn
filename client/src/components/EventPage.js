@@ -197,23 +197,23 @@ function EventPage(){
             <Divider />
             <CardFooter justify='center'>
                 <Wrap spacing='2' justify='center'>
+                    {dateObj > today ? registerButtonOptions : <Button isDisabled={true}>Event Passed</Button>}
+
+                    {user.id === eventInfo.created_by_id ?
+                        <ButtonGroup spacing='2'>
+                            <Button variant='outline' colorScheme='blue' onClick={handleRegistrations}>
+                                View Registered
+                            </Button>
+                            <Button variant='outline' colorScheme='blue' onClick={handleEdit}>
+                                Edit Event Info
+                            </Button>
+                        </ButtonGroup>: null}
                     {registered ? 
-                        <Alert status='success'marginBottom={'5px'}>
+                        <Alert status='success'marginTop={'5px'}>
                             <AlertIcon/>
                             You are registered for {eventInfo.name}!
                         </Alert>: null
                     }
-                    {dateObj > today ? registerButtonOptions : <Button isDisabled={true}>Event Passed</Button>}
-
-                {user.id === eventInfo.created_by_id ?
-                    <ButtonGroup spacing='2'>
-                        <Button variant='outline' colorScheme='blue' onClick={handleRegistrations}>
-                            View Registered
-                        </Button>
-                        <Button variant='outline' colorScheme='blue' onClick={handleEdit}>
-                            Edit Event Info
-                        </Button>
-                    </ButtonGroup>: null}
                 </Wrap>                  
             </CardFooter>
         </Card>

@@ -104,7 +104,7 @@ function EventsPage(){
                     </PopoverContent>
                 </Popover>
             </Center>
-            <Center width='100%'>
+            <Center width='100%' marginBottom='15px'>
                 <Wrap justify='center' paddingTop={'10px'}>
                     {eventCards}
                 </Wrap>

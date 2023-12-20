@@ -54,13 +54,13 @@ function EventCard({event, user, setUser,  setEvents, setMyCreatedIds, setMyRegi
                     />
                 <Wrap justify='center'>
                         <Badge borderRadius='full' px='5' colorScheme='green'>
-                            Group: {event.group.name}
+                            {event.group.name}
                         </Badge>
                         <Badge borderRadius='full' px='5' colorScheme='teal'>
                             {event.event_type.type_name}
                         </Badge>
                     </Wrap>
-                <Stack mt='3px' spacing='3'>
+                <Stack mt='5px' spacing='3'>
                     <Heading size='md'>{event['name']}</Heading>
                         <Text>
                             Date: {dateString}

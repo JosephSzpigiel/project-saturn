@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ChakraProvider, Container, Flex } from '@chakra-ui/react'
+import { Box, ChakraProvider, Container, Flex } from '@chakra-ui/react'
 import {Outlet} from 'react-router-dom';
 import Header from "./Header";
 import SignUp from "./SignUp";
@@ -17,10 +17,12 @@ function App() {
   const [myCreatedIds, setMyCreatedIds]  = useState([])
   const [myGroups, setMyGroups] = useState([])
   const [groups, setGroups]  = useState([])
+  const [notes, setNotes] = useState([])
+
 
   const [loaded, setLoaded] = useState(false)
   const cld = new Cloudinary({cloud: {cloudName: 'dtzlah962'}});
-  const context = {user, myGroups, setGroups, setMyGroups, groups, setUser, events, setEvents, myRegisteredIds, setMyRegisteredIds, myCreatedIds, setMyCreatedIds, cld}
+  const context = {user, notes, setNotes, myGroups, setGroups, setMyGroups, groups, setUser, events, setEvents, myRegisteredIds, setMyRegisteredIds, myCreatedIds, setMyCreatedIds, cld}
 
 
   useEffect(() => {
@@ -36,6 +38,7 @@ function App() {
             setMyRegisteredIds(userObj['registrations'].map(r => r.event_id))
             console.log(userObj['user_groups'])
             setMyGroups(userObj['user_groups'])
+            setNotes(userObj['notifications'])
           }
           )
       } else {
@@ -69,9 +72,9 @@ function App() {
     if(!user){
       return(
         <ChakraProvider>
-          <Header user={user} setUser={setUser} />
+          <Header user={user} setUser={setUser} notes={notes} setNotes={setNotes} />
           <div style={{'marginTop':'70px', 'marginLeft':'10px', 'marginRight':'10px', 'width':'1fr'}}>
-            <SignUp setUser={setUser} setMyGroups={setMyGroups} setMyCreatedIds={setMyCreatedIds} setMyRegisteredIds={setMyRegisteredIds}/>          
+            <SignUp setNotes={setNotes} setUser={setUser} setMyGroups={setMyGroups} setMyCreatedIds={setMyCreatedIds} setMyRegisteredIds={setMyRegisteredIds}/>          
           </div>
       </ChakraProvider>
       )
@@ -79,10 +82,10 @@ function App() {
     console.log(myGroups)
     return(
         <ChakraProvider>
-          <Header user={user} setUser= {setUser}/>
-          <div style={{'marginTop':'70px', 'marginLeft':'10px', 'marginRight':'10px', 'width':'1fr'}}>
+          <Header user={user} setUser= {setUser} notes={notes} setNotes={setNotes}/>
+          <Box  marginTop='70px' paddingLeft='10px' paddingRight='10px' width='1fr'>
             <Outlet context={context}/>
-          </div>
+          </Box>
         </ChakraProvider>
       )
   }

@@ -1,13 +1,16 @@
-import { Card, Image, Stack, Text, CardBody,CardFooter,Button, Heading, Skeleton, ButtonGroup } from "@chakra-ui/react"
+import { Card, Badge, Image, Stack, Text, CardBody,CardFooter,Button, Heading, Skeleton, ButtonGroup, VStack } from "@chakra-ui/react"
 import GroupPic from '../images/GroupPic.png'
 import { useState, useEffect } from "react"
 
 
-function GroupCard({user, group, myGroups, setMyGroups, setGroups, setEvents}){
+function GroupCard({user, group, myGroups, setMyGroups, setGroups, setEvents, events}){
 
     const [joined, setJoined] = useState(false)
     const [admin, setAdmin] = useState(false)
     const [loaded, setLoaded] = useState(false)
+
+    const eventCount = events.filter(event => event.group_id === group.id).length
+    const memberCount = group.user_groups.length
 
     useEffect(()=>{
         try{
@@ -85,6 +88,10 @@ function GroupCard({user, group, myGroups, setMyGroups, setGroups, setEvents}){
                     <Text py='2'>
                         {group.description}
                     </Text>
+                    <VStack align={'left'}>
+                        <Badge bg={'lightblue'}>Number of Events: {eventCount}</Badge>
+                        <Badge bg={'blue.200'}>Number of Members: {memberCount}</Badge>
+                    </VStack>
                     </CardBody>
 
                     <CardFooter>
