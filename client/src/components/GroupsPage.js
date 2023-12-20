@@ -9,13 +9,13 @@ function GroupsPage(){
 
     const { isOpen: isFormOpen , onOpen: onFormOpen, onClose: onFormClose } = useDisclosure()
 
-    const {user, setUser, groups, setGroups, setMyGroups, myGroups} =useOutletContext()
+    const {user, setUser, groups, setGroups, setMyGroups, myGroups, setEvents} =useOutletContext()
 
 
     const nav = useNavigate()
 
     const groupCards = groups.map(group => {
-        return <GroupCard key ={group.id} user={user} group={group} myGroups={myGroups} setMyGroups={setMyGroups} setGroups={setGroups} />
+        return <GroupCard key ={group.id} setEvents={setEvents} user={user} group={group} myGroups={myGroups} setMyGroups={setMyGroups} setGroups={setGroups} />
     })
     
     return(

@@ -10,12 +10,23 @@ function EventForm(){
     const [thumbnail, setThumbnail] = useState('')
 
 
-    const {user, setUser, setEvents, setMyCreatedIds} = useOutletContext()
+    const {user, setUser, setEvents, setMyCreatedIds, myGroups, groups} = useOutletContext()
 
     const navigate = useNavigate()
 
     const URL = /^((https?|ftp):\/\/)?(www.)?(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i
 
+    const myGroupIds = myGroups.map(group => group.group_id)
+
+    const activeGroups = groups.filter(group => {
+        if(myGroupIds.includes(group.id)){
+            return group
+        }
+    })
+
+    const groupOptions = activeGroups.map(group => {
+        return <option key={group.id} value={group.id}>{group.name}</option>
+    })
 
     const eventSchema = yup.object().shape({
         name: yup.string().max(15, 'Event name must be 15 characters or less').required('Event name is required!'),
@@ -23,7 +34,8 @@ function EventForm(){
         event_type_id: yup.number().required('Event Type is required!'),
         start_time: yup.date().required('Start Time is required!'),
         // img_url: yup.string().matches(URL, 'Enter a valid url'),
-        max_tickets: yup.number().integer().positive('Tickets Available must be a positive number').required('Tickets are required!')
+        max_tickets: yup.number().integer().positive('Tickets Available must be a positive number').required('Tickets are required!'),
+        group_id: yup.number().required('Group is required!')
     })
 
     const today = new Date()
@@ -55,7 +67,7 @@ function EventForm(){
                 </BreadcrumbLink>
             </BreadcrumbItem>
         </Breadcrumb>
-        <Flex>
+        <Flex marginBottom={'10px'}>
             <Spacer/>
                 <Flex direction='column'>
                     <Heading m={3} size='lg' align='center'>Create an Event</Heading>
@@ -67,7 +79,8 @@ function EventForm(){
                             event_type_id: '',
                             start_time: '',
                             max_tickets: '',
-                            img_url: ''
+                            img_url: '',
+                            group_id: ''
                         }}
                         validationSchema={eventSchema}
                         validateOnBlur={true}
@@ -152,6 +165,21 @@ function EventForm(){
                                             <FormErrorMessage as={Alert} status={'error'}>
                                                 <AlertIcon />
                                                 {errors.event_type_id}
+                                            </FormErrorMessage>                                        
+                                        </FormControl>
+                                    )}
+                                </Field>
+                                <Field name='group_id'>
+                                    {({ field, form }) => (
+                                        <FormControl marginBottom={2} isInvalid={form.errors.group_id && form.touched.group_id}>
+                                            <FormLabel>Group</FormLabel>
+                                            <Select {...field}>
+                                                <option value='' disabled> Select option</option>
+                                                {groupOptions}
+                                            </Select>
+                                            <FormErrorMessage as={Alert} status={'error'}>
+                                                <AlertIcon />
+                                                {errors.group_id}
                                             </FormErrorMessage>                                        
                                         </FormControl>
                                     )}

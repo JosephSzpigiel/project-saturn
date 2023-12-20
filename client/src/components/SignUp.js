@@ -5,7 +5,7 @@ import { useState } from 'react'
 import UploadWidget from './UploadWidget'
 
 
-function SignUp( {setUser} ){
+function SignUp( {setUser, setMyGroups, setMyCreatedIds, setMyRegisteredIds} ){
 
     const [signUp, setSignUp] = useState(false)
     const [loginError, setLoginError] = useState(false)
@@ -57,6 +57,9 @@ function SignUp( {setUser} ){
                                     resp.json().then(({ user }) => {
                                         console.log(user)
                                         setUser(user)
+                                        setMyGroups(user['user_groups'])
+                                        setMyCreatedIds(user['events_created'].map(e => e.id))
+                                        setMyRegisteredIds(user['registrations'].map(r => r.event_id))
                                         // navigate into site
                                     })
                                 } else { 

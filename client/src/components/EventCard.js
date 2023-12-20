@@ -1,12 +1,13 @@
-import { Card, CardHeader, CardBody, CardFooter, Skeleton, Image, Stack, Text, Divider, Button, ButtonGroup, Heading, VStack } from '@chakra-ui/react'
+import { Card, CardHeader, Wrap, Badge, CardBody, CardFooter, Image, Stack, Text, Divider, Button, ButtonGroup, Heading, VStack } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import square from '../images/blue_square.jpeg'
+import whiteSquare from '../images/WhiteSquare.png'
 
-function EventCard({event, user, setUser,  setEvents, setMyCreatedIds, setMyRegisteredIds}){
+function EventCard({event, user, setUser,  setEvents, setMyCreatedIds, setMyRegisteredIds, groups}){
 
 
-    let loaded = false
+
     const nav = useNavigate()
 
     const date = new Date(event.start_time).toString().split(' ')
@@ -36,26 +37,30 @@ function EventCard({event, user, setUser,  setEvents, setMyCreatedIds, setMyRegi
         })
     }
 
-    const fallbackOption = event['img_url'] ? <Skeleton height={'250px'} width={'250px'}/> : null
-    const fallbackSrcOption = !event['img_url'] ? square : null
+    // const fallbackOption = event['img_url'] ? whiteSquare : null
+    const fallbackSrcOption = !event['img_url'] ? square : whiteSquare
 
     return(
         <Card width={'20%'} minW={'300px'}>
             <CardBody>
-                {/* <Skeleton isLoaded= {loaded}> */}
-                    <Image
-                        src={event['img_url']}
-                        alt={event['name']}
-                        borderRadius='lg'
-                        // fallbackSrc={square}
-                        fallbackSrc={fallbackSrcOption}
-                        fallback={fallbackOption}
-                        boxSize='250px'
-                        objectFit='cover'
-                        onLoad={() => loaded = true}
-                        />
-                {/* </Skeleton> */}
-                <Stack mt='6' spacing='3'>
+                <Image
+                    src={event['img_url']}
+                    alt={event['name']}
+                    borderRadius='lg'
+                    fallbackSrc={fallbackSrcOption}
+                    boxSize='250px'
+                    objectFit='cover'
+                    marginBottom={'10px'}
+                    />
+                <Wrap justify='center'>
+                        <Badge borderRadius='full' px='5' colorScheme='green'>
+                            Group: {event.group.name}
+                        </Badge>
+                        <Badge borderRadius='full' px='5' colorScheme='teal'>
+                            {event.event_type.type_name}
+                        </Badge>
+                    </Wrap>
+                <Stack mt='3px' spacing='3'>
                     <Heading size='md'>{event['name']}</Heading>
                         <Text>
                             Date: {dateString}

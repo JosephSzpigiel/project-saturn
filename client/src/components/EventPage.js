@@ -15,7 +15,7 @@ import square from '../images/blue_square.jpeg'
 
 function EventPage(){
     const {eventId} = useParams()
-    const [eventInfo, setEventInfo] = useState({created_by:{first_name: '', last_name: ''}, event_type:{type_name: ''}, registrations:[]})
+    const [eventInfo, setEventInfo] = useState({created_by:{first_name: '', last_name: ''}, event_type:{type_name: ''}, registrations:[], group:{name: ''}})
     const {user, setUser, setEvents, myRegisteredIds, setMyRegisteredIds} = useOutletContext()
     const [loaded, setLoaded] = useState(false)
     const [registered, setRegistered] = useState(false)
@@ -33,6 +33,7 @@ function EventPage(){
             if (resp.ok) {
                 resp.json()
                 .then((event) => {
+                    console.log(event)
                     setEventInfo(event)
                     console.log(myRegisteredIds)
                     if( myRegisteredIds.filter(id => id === event.id).length !== 0){
@@ -175,6 +176,9 @@ function EventPage(){
 
                 <Stack mt='6' spacing='3' wrap={true}>
                     <Wrap justify='center'>
+                        <Badge borderRadius='full' px='5' colorScheme='green'>
+                            Group: {eventInfo.group.name}
+                        </Badge>
                         <Badge borderRadius='full' px='5' colorScheme='teal'>
                             {eventInfo.event_type.type_name}
                         </Badge>

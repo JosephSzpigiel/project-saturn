@@ -47,7 +47,8 @@ class Events(Resource):
             created_by_id = params['created_by_id'],
             event_type_id = params['event_type_id'],
             start_time = dateObj,
-            max_tickets = params['max_tickets']
+            max_tickets = params['max_tickets'],
+            group_id = params['group_id']
         )
         db.session.add(new_event)
         db.session.commit()

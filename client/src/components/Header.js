@@ -14,6 +14,7 @@ function Header({user, setUser}) {
         }).then((resp) => {
             if (resp.ok) {
                 setUser(null)
+                
                 nav('/')
             }
         })

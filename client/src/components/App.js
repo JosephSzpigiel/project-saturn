@@ -29,16 +29,19 @@ function App() {
       if (resp.ok) {
         resp.json().then(
           (userObj) => {
+            console.log(userObj)
             setUser(userObj)
             console.log(userObj['events_created'])
             setMyCreatedIds(userObj['events_created'].map(e => e.id))
             setMyRegisteredIds(userObj['registrations'].map(r => r.event_id))
+            console.log(userObj['user_groups'])
             setMyGroups(userObj['user_groups'])
           }
           )
       } else {
         // handle what should happen if not logged in
         console.log('No login')
+        setLoaded(true)
       }
     }).then(()=>{
       fetch('/events')
@@ -68,7 +71,7 @@ function App() {
         <ChakraProvider>
           <Header user={user} setUser={setUser} />
           <div style={{'marginTop':'70px', 'marginLeft':'10px', 'marginRight':'10px', 'width':'1fr'}}>
-            <SignUp setUser={setUser} />          
+            <SignUp setUser={setUser} setMyGroups={setMyGroups} setMyCreatedIds={setMyCreatedIds} setMyRegisteredIds={setMyRegisteredIds}/>          
           </div>
       </ChakraProvider>
       )

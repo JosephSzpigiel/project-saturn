@@ -3,7 +3,7 @@ import GroupPic from '../images/GroupPic.png'
 import { useState, useEffect } from "react"
 
 
-function GroupCard({user, group, myGroups, setMyGroups, setGroups}){
+function GroupCard({user, group, myGroups, setMyGroups, setGroups, setEvents}){
 
     const [joined, setJoined] = useState(false)
     const [admin, setAdmin] = useState(false)
@@ -11,6 +11,7 @@ function GroupCard({user, group, myGroups, setMyGroups, setGroups}){
 
     useEffect(()=>{
         try{
+            console.log(myGroups)
             if(myGroups.filter(listGroup => listGroup.group_id === group.id).length == 1){
                 setJoined(true)
                 if(myGroups.filter(listGroup => listGroup.group_id === group.id)[0]['admin'] == true){
@@ -28,6 +29,7 @@ function GroupCard({user, group, myGroups, setMyGroups, setGroups}){
             if (resp.ok) {
                 setGroups(curr => {return([...curr.filter(listGroup => listGroup.id !== group.id)])})
                 setMyGroups(curr => [...curr].filter(mygroup => mygroup.group_id !== group.id))
+                setEvents(curr=> [...curr].filter(event => event.group_id !== group.id))
             }
         })
     }
@@ -90,8 +92,8 @@ function GroupCard({user, group, myGroups, setMyGroups, setGroups}){
                             {!joined ? <Button variant='solid' colorScheme='blue' onClick={handleJoin}>
                                 Join
                             </Button>:
-                            <Button variant='solid' colorScheme='blue' onClick={handleLeave}>
-                                Leave
+                            <Button variant='solid' isDisabled={true} colorScheme='green' onClick={handleLeave}>
+                                Joined!
                             </Button>
                             }
                             {admin ? <Button variant={'solid'} colorScheme="blue" onClick={handleDelete}>
