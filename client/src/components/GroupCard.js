@@ -10,6 +10,7 @@ function GroupCard({user, group, myGroups, setMyGroups, setGroups, setEvents, ev
     const [loaded, setLoaded] = useState(false)
 
     const eventCount = events.filter(event => event.group_id === group.id).length
+
     const memberCount = group.user_groups.length
 
     useEffect(()=>{
@@ -49,6 +50,14 @@ function GroupCard({user, group, myGroups, setMyGroups, setGroups, setEvents, ev
                 resp.json().then((userGroup)=>{
                     setJoined(true)
                     setMyGroups(curr => [...curr, userGroup])
+                    setGroups(curr => [...curr].map(liGroup => {
+                        if(liGroup.id === group.id){
+                            liGroup['user_groups'] = [...liGroup['user_groups'], userGroup]
+                            return liGroup
+                        }else{
+                            return liGroup
+                        }
+                    }))
                 })
             }
         })

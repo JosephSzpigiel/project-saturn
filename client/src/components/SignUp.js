@@ -29,7 +29,7 @@ function SignUp( {setUser, setMyGroups, setMyCreatedIds, setMyRegisteredIds, set
     return (
         <Flex>
             <Spacer/>
-                <Flex direction='column' backgroud>
+                <Flex direction='column'>
                     <Heading m={3} size='lg' align='center'>{signUp ? 'Sign Up' : 'Log In'}</Heading>
                     <Button minWidth={360} size='sm' onClick={toggleSignup}>{signUp ? `Have an account? Login instead!` : 'Register for an account'}</Button>
                     <Formik
