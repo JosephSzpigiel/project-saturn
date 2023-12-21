@@ -34,7 +34,7 @@ function GroupsTab({groups, myGroups}){
                 <Tr>
                     <Th>Group Name</Th>
                     <Th>Group Id</Th>
-                    <Th></Th>
+                    <Th>Description</Th>
                 </Tr>
             </Thead>
             <Tbody>
