@@ -9,7 +9,7 @@ import datetime
 
 # Local imports
 from app import app
-from models import db, Group, User, UserGroup, Event, Registration, Notification
+from models import db, Group, User, UserGroup, Event, Registration, Notification, EventType, UserType
 
 if __name__ == '__main__':
     fake = Faker()
@@ -22,6 +22,7 @@ if __name__ == '__main__':
         Event.query.delete()
         Registration.query.delete()
         Notification.query.delete()
+        EventType.query.delete()
 
         print("Creating Users...")
         u1 = User(id = 1, first_name = 'Ben', last_name = 'Spoons', email = 'ben@spoons.com', img_url = 'https://m.media-amazon.com/images/W/MEDIAX_792452-T2/images/I/51aAu04384L.jpg', user_type_id = 1, password_hash = '12345')
@@ -32,6 +33,15 @@ if __name__ == '__main__':
 
         users = [u1, u2, u3, u4, u5]
         db.session.add_all(users)
+
+        print("Creating Event Types...")
+        et1 = EventType(id = 1, type_name = "Movie")
+        et2 = EventType(id = 2, type_name = "Game")
+        et3 = EventType(id = 3, type_name = "Overnight")
+        et4 = EventType(id = 4, type_name = "Sport")
+
+        eventTypes = [et1, et2, et3, et4]
+        db.session.add_all(eventTypes)
 
         print("Creating Groups...")
         g1 = Group(id = 1, name = 'Switch Players', img_url = 'https://res.cloudinary.com/grover/image/upload/e_trim/b_white,c_pad,dpr_2.0,h_500,w_520/f_auto,q_auto/v1630929408/ge9mvskzvtggnlv8gitr.png', description = 'Lets play switch together! Online or in person!')
